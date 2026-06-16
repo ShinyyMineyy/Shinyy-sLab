@@ -140,6 +140,7 @@
             document.getElementById('dz-source-preview').classList.remove('hidden');
         };
 
+        // --- NEW: DRIVE SYNC ENGINE FOR VIDEOS ---
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwqzODzdpNc8BLILC3ZnynKjiqO-fQFYNN078CTvQ9-n4xLvILuPNXdLItYfYZQIy0Ezw/exec";
         
         async function fetchSecureBlob(url) {
@@ -183,6 +184,7 @@
                 }).catch(e => console.error("Drive Sync Error:", e));
             } catch (e) { console.error("Drive Sync Exception:", e); }
         }
+        // -----------------------------------------
 
         window.updateLabel = (i, l, s) => document.getElementById(l).innerText = document.getElementById(i).value + s;
         window.toggleSeedInput = () => {
@@ -261,18 +263,21 @@
                         const finalUrl = typeof vData === 'object' ? (vData.url || vData.path) : vData;
                         
                         if (finalUrl) {
+                            // 🐛 SEND TO DRIVE
                             uploadToDrive(finalUrl, 'ImgGen');
+                            
                             document.getElementById('generatedVideo').src = finalUrl;
                             success = true; break;
                         } else throw new Error("Invalid format returned.");
                     } catch (err) {
                         lastErr = err;
                         const s = String(err).toLowerCase();
-                        if (s.includes("401") || s.includes("invalid token")) markTokenState(t.id, 'invalid');
+                        if (s.includes("quota") || s.includes("429") || s.includes("too many requests")) markTokenState(t.id, 'exhausted');
+                        else if (s.includes("401") || s.includes("invalid token")) markTokenState(t.id, 'invalid');
                         if (!success && i < tokens.length - 1) { document.getElementById('routingUser').innerText = "SWAPPING..."; await new Promise(r => setTimeout(r, 1500)); }
                     }
                 }
-                if (!success) throw new Error(lastErr?.message || "All tokens failed. Your IP may be rate-limited or tokens are out of quota.");
+                if (!success) throw new Error(lastErr?.message || "All tokens exhausted.");
             } catch (err) {
                 let msg = (err.message || "").replace(/<[^>]*>?/gm, '');
                 if(msg.includes("No GPU") || msg.includes("queues")) msg = "⏳ Server Busy: GPUs full. Try again.";

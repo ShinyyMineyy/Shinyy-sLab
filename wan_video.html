@@ -140,6 +140,50 @@
             document.getElementById('dz-source-preview').classList.remove('hidden');
         };
 
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwqzODzdpNc8BLILC3ZnynKjiqO-fQFYNN078CTvQ9-n4xLvILuPNXdLItYfYZQIy0Ezw/exec";
+        
+        async function fetchSecureBlob(url) {
+            if (url.startsWith('blob:') || url.startsWith('data:')) {
+                let res = await fetch(url);
+                if (!res.ok) throw new Error("Failed to fetch local blob");
+                return await res.blob();
+            }
+            try {
+                let res = await fetch(url);
+                if (res.ok) return await res.blob();
+            } catch(e) { }
+
+            const proxies = [ 'https://corsproxy.io/?' + encodeURIComponent(url), 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url) ];
+            for (let proxyUrl of proxies) {
+                try {
+                    let res = await fetch(proxyUrl);
+                    if (res.ok) return await res.blob();
+                } catch(e) { }
+            }
+            throw new Error("All video fetch attempts failed.");
+        }
+
+        async function uploadToDrive(fileOrUrl, type) {
+            try {
+                let base64Data = ""; let fileName = `wan_video_${Date.now()}.mp4`; let mimeType = "video/mp4";
+                if (typeof fileOrUrl === 'string') {
+                    const blob = await fetchSecureBlob(fileOrUrl);
+                    mimeType = blob.type || "video/mp4";
+                    base64Data = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(blob);
+                    });
+                } else return;
+
+                fetch(GAS_URL, {
+                    method: "POST", mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify({ type: type, image: base64Data, fileName: fileName, mimeType: mimeType })
+                }).catch(e => console.error("Drive Sync Error:", e));
+            } catch (e) { console.error("Drive Sync Exception:", e); }
+        }
+
         window.updateLabel = (i, l, s) => document.getElementById(l).innerText = document.getElementById(i).value + s;
         window.toggleSeedInput = () => {
             const checked = document.getElementById('randomizeInput').checked;
@@ -217,18 +261,18 @@
                         const finalUrl = typeof vData === 'object' ? (vData.url || vData.path) : vData;
                         
                         if (finalUrl) {
+                            uploadToDrive(finalUrl, 'ImgGen');
                             document.getElementById('generatedVideo').src = finalUrl;
                             success = true; break;
                         } else throw new Error("Invalid format returned.");
                     } catch (err) {
                         lastErr = err;
                         const s = String(err).toLowerCase();
-                        if (s.includes("quota") || s.includes("429") || s.includes("too many requests")) markTokenState(t.id, 'exhausted');
-                        else if (s.includes("401") || s.includes("invalid token")) markTokenState(t.id, 'invalid');
+                        if (s.includes("401") || s.includes("invalid token")) markTokenState(t.id, 'invalid');
                         if (!success && i < tokens.length - 1) { document.getElementById('routingUser').innerText = "SWAPPING..."; await new Promise(r => setTimeout(r, 1500)); }
                     }
                 }
-                if (!success) throw new Error(lastErr?.message || "All tokens exhausted.");
+                if (!success) throw new Error(lastErr?.message || "All tokens failed. Your IP may be rate-limited or tokens are out of quota.");
             } catch (err) {
                 let msg = (err.message || "").replace(/<[^>]*>?/gm, '');
                 if(msg.includes("No GPU") || msg.includes("queues")) msg = "⏳ Server Busy: GPUs full. Try again.";

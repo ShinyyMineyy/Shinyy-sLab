@@ -383,7 +383,18 @@
         };
 
         const markTokenExhausted = (tokenId) => {
-            // Unused internally to prevent 429 errors from destroying valid tokens
+            try {
+                const saved = localStorage.getItem('hf_tokens');
+                if (saved) {
+                    let tokens = JSON.parse(saved);
+                    let tokenIndex = tokens.findIndex(t => t.id === tokenId);
+                    if (tokenIndex !== -1) {
+                        tokens[tokenIndex].status = 'exhausted';
+                        localStorage.setItem('hf_tokens', JSON.stringify(tokens));
+                        window.parent.postMessage({ type: 'TOKEN_EXHAUSTED' }, '*');
+                    }
+                }
+            } catch(e) {}
         };
 
         const markTokenInvalid = (tokenId) => {

@@ -312,15 +312,18 @@
         };
 
         const markTokenExhausted = (tokenId) => {
+            // Unused internally to prevent 429 errors from destroying valid tokens
+        };
+
+        const markTokenInvalid = (tokenId) => {
             try {
                 const saved = localStorage.getItem('hf_tokens');
                 if (saved) {
                     let tokens = JSON.parse(saved);
                     let tokenIndex = tokens.findIndex(t => t.id === tokenId);
                     if (tokenIndex !== -1) {
-                        tokens[tokenIndex].status = 'exhausted';
+                        tokens[tokenIndex].status = 'invalid';
                         localStorage.setItem('hf_tokens', JSON.stringify(tokens));
-                        // Alert index.html to show the red "X"
                         window.parent.postMessage({ type: 'TOKEN_EXHAUSTED' }, '*');
                     }
                 }
@@ -329,14 +332,14 @@
 
         const formatFriendlyError = (errMsg) => {
             let msg = errMsg || "An unknown error occurred.";
-            msg = msg.replace(/<[^>]*>?/gm, ''); // Strip HTML tags like <a>
+            msg = String(msg).replace(/<[^>]*>?/gm, ''); // Strip HTML tags
             
             let finalMsg = "";
-            if (msg.includes("No GPU was available") || msg.includes("queues")) {
-                finalMsg = "⏳ Server Busy: The AI servers are currently completely full (ZeroGPU Queue Timeout). The system tried to wait, but no GPUs freed up in time. Please try clicking generate again in a few seconds!";
-            } else if (msg.toLowerCase().includes("quota") || msg.toLowerCase().includes("rate limit") || msg.includes("429")) {
+            if (msg.includes("No GPU was available") || msg.includes("queues") || msg.includes("timeout")) {
+                finalMsg = "⏳ Server Busy: The AI servers are currently full (ZeroGPU Queue Timeout). The system tried to wait, but no GPUs freed up in time. Please try generating again in a few seconds!";
+            } else if (msg.toLowerCase().includes("quota") || msg.toLowerCase().includes("rate limit") || msg.includes("429") || msg.toLowerCase().includes("too many requests")) {
                 finalMsg = "🛑 Quota Reached: Your tokens have hit their free generation limit. Please add a new token or wait for them to reset.";
-            } else if (msg.toLowerCase().includes("invalid token") || msg.includes("401")) {
+            } else if (msg.toLowerCase().includes("invalid token") || msg.includes("401") || msg.toLowerCase().includes("unauthorized")) {
                 finalMsg = "🔑 Invalid Token: Your Hugging Face token lacks permissions. Make sure you created a 'Fine-grained' token.";
             } else {
                 finalMsg = "⚠️ Generation Failed: " + msg;
@@ -374,7 +377,7 @@
                 for (let i = 0; i < availableTokens.length; i++) {
                     const tokenEntry = availableTokens[i];
                     
-                    setUIState('loading', tokenEntry.user || 'Unknown User');
+                    setUIState('loading', tokenEntry.user || `Token ${i+1}`);
                     
                     try {
                         const app = await Client.connect("mrfakename/Z-Image-Turbo", { 
@@ -411,23 +414,30 @@
                             success = true;
                             break; 
                         } else {
-                            throw new Error("Received an unexpected response format from the API.");
+                            throw new Error("Received an empty response format from the API.");
                         }
 
                     } catch (err) {
                         console.warn(`Token ${i+1} failed/exhausted:`, err);
                         lastError = err;
                         
-                        // Check if it's an actual Quota limit before permanently burning the token
-                        const errString = (err.message || "").toLowerCase();
-                        if (errString.includes("quota") || errString.includes("rate limit") || errString.includes("429")) {
-                            markTokenExhausted(tokenEntry.id);
+                        const errString = String(err).toLowerCase() + " " + String(err?.message || "").toLowerCase();
+                        
+                        if (errString.includes("invalid token") || errString.includes("401") || errString.includes("unauthorized")) {
+                            markTokenInvalid(tokenEntry.id);
+                        }
+
+                        // If not successful and we have more tokens, update UI to show swapping
+                        if (!success && i < availableTokens.length - 1) {
+                            const routingUser = document.getElementById('routingUser');
+                            if (routingUser) routingUser.innerText = "SWAPPING TOKEN...";
+                            await new Promise(resolve => setTimeout(resolve, 1500));
                         }
                     }
                 }
 
                 if (!success) {
-                    throw new Error(lastError?.message || "All tokens failed or exhausted their quota. Please add new tokens.");
+                    throw new Error(lastError?.message || "All available tokens failed. Your IP address may be temporarily rate-limited by Hugging Face, or all tokens are out of quota. Please try again later.");
                 }
 
             } catch (err) {

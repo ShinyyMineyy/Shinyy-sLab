@@ -378,18 +378,7 @@
         };
 
         const markTokenExhausted = (tokenId) => {
-            try {
-                const saved = localStorage.getItem('hf_tokens');
-                if (saved) {
-                    let tokens = JSON.parse(saved);
-                    let tokenIndex = tokens.findIndex(t => t.id === tokenId);
-                    if (tokenIndex !== -1) {
-                        tokens[tokenIndex].status = 'exhausted';
-                        localStorage.setItem('hf_tokens', JSON.stringify(tokens));
-                        window.parent.postMessage({ type: 'TOKEN_EXHAUSTED' }, '*');
-                    }
-                }
-            } catch(e) {}
+            // Unused internally to prevent 429 errors from destroying valid tokens
         };
 
         const markTokenInvalid = (tokenId) => {
@@ -460,9 +449,8 @@
                         });
 
                         const apiResult = await app.predict("/face_swap", [
-                            // 🐛 FIXED: Wires are now un-crossed and back to their proper order!
-                            handle_file(globalFsSourceFile), // reference_face (Source)
-                            handle_file(globalFsTargetFile), // target_image (Body/Scene)
+                            handle_file(globalFsSourceFile), 
+                            handle_file(globalFsTargetFile), 
                             seed,
                             randomizeSeed,
                             width,
@@ -510,9 +498,7 @@
                         
                         const errString = String(err).toLowerCase() + " " + String(err?.message || "").toLowerCase();
                         
-                        if (errString.includes("quota") || errString.includes("rate limit") || errString.includes("429") || errString.includes("too many requests")) {
-                            markTokenExhausted(tokenEntry.id);
-                        } else if (errString.includes("invalid token") || errString.includes("401") || errString.includes("unauthorized")) {
+                        if (errString.includes("invalid token") || errString.includes("401") || errString.includes("unauthorized")) {
                             markTokenInvalid(tokenEntry.id);
                         }
 
@@ -525,7 +511,7 @@
                 }
 
                 if (!success) {
-                    throw new Error(lastError?.message || "All available tokens failed or exhausted their quota. Please add new tokens.");
+                    throw new Error(lastError?.message || "All available tokens failed. Your IP address may be temporarily rate-limited by Hugging Face, or all tokens are out of quota. Please try again later.");
                 }
 
             } catch (err) {

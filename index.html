@@ -66,10 +66,13 @@
     input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #333; border-radius: 3px; }
     
     /* Custom Scrollbar */
-    ::-webkit-scrollbar { width: 8px; }
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
     ::-webkit-scrollbar-track { background: #141414; }
     ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
     ::-webkit-scrollbar-thumb:hover { background: #555; }
+    
+    /* Specific scrollbar for inner elements to be a bit slimmer */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
   </style>
 </head>
 <body class="bg-appBg text-textMain min-h-screen font-sans antialiased selection:bg-neutral-300 selection:text-black flex flex-col">
@@ -139,7 +142,7 @@
             </div>
           </div>
           
-          <div id="hubTokenContainer" class="space-y-3 max-h-[280px] overflow-y-auto pr-1 relative z-10">
+          <div id="hubTokenContainer" class="space-y-3 max-h-[280px] overflow-y-auto pr-1 relative z-10 custom-scrollbar">
             <!-- Tokens will be rendered here dynamically -->
           </div>
           <input type="file" id="import-token-file" class="hidden" accept=".json" onchange="handleImportTokens(event)">
@@ -238,6 +241,23 @@
             <span class="relative z-10 bg-[#1a1a1a] text-neutral-400 text-[9px] px-2 py-0.5 rounded-sm uppercase font-bold border border-[#333] whitespace-nowrap ml-4 hidden sm:block">Pro Video Swap</span>
           </div>
 
+          <!-- Box 6: Qwen 3D Camera -->
+          <div onclick="openHubModel('qwen-camera')" class="md:col-span-2 lg:col-span-4 row-span-1 bg-[#141414] border border-[#262626] rounded-xl p-6 cursor-pointer hover:border-neutral-400 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all group relative overflow-hidden flex items-center justify-between">
+            <div class="absolute -right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition-transform duration-500">
+              <i data-lucide="box" class="w-48 h-48 text-white"></i>
+            </div>
+            <div class="relative z-10 flex items-center w-full">
+              <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white flex flex-shrink-0 items-center justify-center mr-5 group-hover:scale-110 transition-transform">
+                 <i data-lucide="focus" class="w-6 h-6"></i>
+              </div>
+              <div class="flex-grow">
+                <h3 class="text-xl font-bold text-white mb-1">3D Camera Editor</h3>
+                <p class="text-xs text-neutral-400 leading-relaxed max-w-lg">Interactive 3D WebGL camera controller to manipulate perspective, zoom, and orientation of 2D images in real-time.</p>
+              </div>
+            </div>
+            <span class="relative z-10 bg-[#1a1a1a] text-neutral-400 text-[9px] px-2 py-0.5 rounded-sm uppercase font-bold border border-[#333] whitespace-nowrap ml-4 hidden sm:block">Pro 3D Edit</span>
+          </div>
+
         </div>
       </div>
 
@@ -293,6 +313,17 @@
           </button>
           <div class="w-full flex-grow rounded-2xl overflow-hidden border border-[#262626] shadow-2xl bg-[#0a0a0a]">
             <iframe src="video_swap.html" class="w-full h-full border-none bg-transparent" title="Hyperswap Video Model"></iframe>
+          </div>
+        </div>
+      </div>
+
+      <div id="hub-model-qwen-camera" class="hidden w-full max-w-7xl mx-auto animate-fade-in">
+        <div class="flex flex-col space-y-4 h-[90vh] w-full">
+          <button onclick="closeHubModel()" class="group flex items-center text-neutral-400 hover:text-white text-sm font-semibold transition-colors bg-[#141414] border border-[#262626] px-4 py-2 rounded-lg hover:border-neutral-500 w-fit flex-shrink-0">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"></i> Back to Hub
+          </button>
+          <div class="w-full flex-grow rounded-2xl overflow-hidden border border-[#262626] shadow-2xl bg-[#0a0a0a]">
+            <iframe src="qwen_camera.html" class="w-full h-full border-none bg-transparent" title="3D Camera Model"></iframe>
           </div>
         </div>
       </div>
@@ -532,36 +563,42 @@
       </div>
     </div>
 
-    <!-- ===================== FACE SWAP TAB ===================== -->
+    <!-- ===================== FACE SWAP TAB (BATCH) ===================== -->
     <div id="view-faceswap" class="hidden animate-fade-in">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         
-        <!-- Column 1: Source -->
+        <!-- Column 1: Source (Faces) -->
         <div class="flex flex-col space-y-6">
           <div class="h-auto">
             <div class="bg-panelBg rounded-lg border border-panelBorder shadow-lg h-full flex flex-col overflow-hidden transition-shadow hover:shadow-xl">
-              <div class="px-4 py-3 border-b border-panelBorder bg-neutral-900/50 flex items-center">
-                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Source (Face)</span>
+              <div class="px-4 py-3 border-b border-panelBorder bg-neutral-900/50 flex items-center justify-between">
+                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Source (Faces)</span>
+                <span id="fs-source-count" class="text-[10px] font-bold text-accent hidden">0</span>
               </div>
-              <div class="p-4 flex-grow flex flex-col">
-                <div id="dz-fs-source" class="w-full h-40 border border-dashed border-inputBorder rounded-lg bg-inputBg flex flex-col items-center justify-center overflow-hidden transition-colors cursor-pointer hover:border-neutral-500 hover:bg-neutral-800 relative group" onclick="triggerFileInput('file-fs-source')" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'fs-source')">
-                  <div id="dz-fs-source-empty" class="text-center p-4">
-                    <div class="bg-neutral-800/50 p-2.5 rounded-full inline-block mb-2 group-hover:bg-neutral-700/50 transition-colors">
+              <div class="p-4 flex-grow flex flex-col h-48">
+                <div id="dz-fs-source" class="w-full h-full border border-dashed border-inputBorder rounded-lg bg-inputBg flex flex-col items-center justify-center overflow-hidden transition-colors relative">
+                  <div id="dz-fs-source-empty" class="text-center p-4 cursor-pointer w-full h-full flex flex-col items-center justify-center hover:bg-neutral-800" onclick="triggerFileInput('file-fs-source')" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'fs-source')">
+                    <div class="bg-neutral-800/50 p-2.5 rounded-full inline-block mb-2 transition-colors">
                       <i data-lucide="upload" class="w-5 h-5 text-neutral-400"></i>
                     </div>
-                    <p class="text-textMain text-sm font-semibold">Drop Face Image</p>
+                    <p class="text-textMain text-sm font-semibold">Drop Face Images</p>
                   </div>
-                  <div id="dz-fs-source-preview" class="hidden absolute inset-0 w-full h-full p-2"><img id="dz-fs-source-img" src="" class="w-full h-full object-contain rounded"><div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded"><p class="text-white text-xs font-semibold tracking-wide">Replace</p></div></div>
-                  <input type="file" id="file-fs-source" class="hidden" accept="image/*" onchange="handleFileSelect(event, 'fs-source')">
+                  <div id="dz-fs-source-preview" class="hidden absolute inset-0 w-full h-full p-2 bg-[#1a1a1a] overflow-y-auto custom-scrollbar z-10" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'fs-source')">
+                     <div id="fs-source-gallery" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+                  </div>
+                  <input type="file" id="file-fs-source" class="hidden" accept="image/*" multiple onchange="handleFileSelect(event, 'fs-source')">
                 </div>
-                <div class="mt-3 flex justify-center gap-2 border-t border-panelBorder pt-3">
-                  <button onclick="handlePasteImage('fs-source')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
-                    <i data-lucide="clipboard-paste" class="w-3 h-3 mr-1"></i> Paste
-                  </button>
-                  <button id="dz-fs-source-clear" onclick="clearDropzone('fs-source')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-danger/50">
-                    <i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear
-                  </button>
-                </div>
+              </div>
+              <div class="px-4 pb-4 flex justify-center gap-2 border-t border-panelBorder pt-4">
+                <button onclick="triggerFileInput('file-fs-source')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
+                  <i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add More
+                </button>
+                <button onclick="handlePasteImage('fs-source')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
+                  <i data-lucide="clipboard-paste" class="w-3 h-3 mr-1"></i> Paste
+                </button>
+                <button id="dz-fs-source-clear" onclick="clearDropzone('fs-source')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-danger/50">
+                  <i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear All
+                </button>
               </div>
             </div>
           </div>
@@ -583,37 +620,43 @@
           </div>
         </div>
 
-        <!-- Column 2: Target & Controls -->
+        <!-- Column 2: Target (Bodies) & Controls -->
         <div class="flex flex-col space-y-6 relative">
-          <div class="flex justify-center -my-3 lg:absolute lg:-left-10 lg:top-28 z-10 lg:w-auto w-full">
-            <button onclick="swapFaceInputs()" class="bg-accent hover:bg-accentHover text-accentText p-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.3)] border-4 border-appBg transition-transform hover:scale-110 focus:outline-none" title="Swap Source and Target">
+          <div class="flex justify-center -my-3 lg:absolute lg:-left-10 lg:top-24 z-20 lg:w-auto w-full">
+            <button onclick="swapFaceInputs()" class="bg-accent hover:bg-accentHover text-accentText p-2.5 rounded-full shadow-[0_0_15px_rgba(255,255,255,0.3)] border-4 border-appBg transition-transform hover:scale-110 focus:outline-none" title="Swap Source and Target Collections">
                <i data-lucide="arrow-right-left" class="w-4 h-4"></i>
             </button>
           </div>
           <div class="h-auto">
             <div class="bg-panelBg rounded-lg border border-panelBorder shadow-lg h-full flex flex-col overflow-hidden transition-shadow hover:shadow-xl">
-              <div class="px-4 py-3 border-b border-panelBorder bg-neutral-900/50 flex items-center">
-                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Target (Body)</span>
+              <div class="px-4 py-3 border-b border-panelBorder bg-neutral-900/50 flex items-center justify-between">
+                <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Target (Bodies)</span>
+                <span id="fs-target-count" class="text-[10px] font-bold text-accent hidden">0</span>
               </div>
-              <div class="p-4 flex-grow flex flex-col">
-                <div id="dz-fs-target" class="w-full h-40 border border-dashed border-inputBorder rounded-lg bg-inputBg flex flex-col items-center justify-center overflow-hidden transition-colors cursor-pointer hover:border-neutral-500 hover:bg-neutral-800 relative group" onclick="triggerFileInput('file-fs-target')" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'fs-target')">
-                  <div id="dz-fs-target-empty" class="text-center p-4">
-                    <div class="bg-neutral-800/50 p-2.5 rounded-full inline-block mb-2 group-hover:bg-neutral-700/50 transition-colors">
+              <div class="p-4 flex-grow flex flex-col h-48">
+                <div id="dz-fs-target" class="w-full h-full border border-dashed border-inputBorder rounded-lg bg-inputBg flex flex-col items-center justify-center overflow-hidden transition-colors relative">
+                  <div id="dz-fs-target-empty" class="text-center p-4 cursor-pointer w-full h-full flex flex-col items-center justify-center hover:bg-neutral-800" onclick="triggerFileInput('file-fs-target')" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'fs-target')">
+                    <div class="bg-neutral-800/50 p-2.5 rounded-full inline-block mb-2 transition-colors">
                       <i data-lucide="upload" class="w-5 h-5 text-neutral-400"></i>
                     </div>
-                    <p class="text-textMain text-sm font-semibold">Drop Body Image</p>
+                    <p class="text-textMain text-sm font-semibold">Drop Body Images</p>
                   </div>
-                  <div id="dz-fs-target-preview" class="hidden absolute inset-0 w-full h-full p-2"><img id="dz-fs-target-img" src="" class="w-full h-full object-contain rounded"><div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded"><p class="text-white text-xs font-semibold tracking-wide">Replace</p></div></div>
-                  <input type="file" id="file-fs-target" class="hidden" accept="image/*" onchange="handleFileSelect(event, 'fs-target')">
+                  <div id="dz-fs-target-preview" class="hidden absolute inset-0 w-full h-full p-2 bg-[#1a1a1a] overflow-y-auto custom-scrollbar z-10" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'fs-target')">
+                     <div id="fs-target-gallery" class="grid grid-cols-2 sm:grid-cols-3 gap-2"></div>
+                  </div>
+                  <input type="file" id="file-fs-target" class="hidden" accept="image/*" multiple onchange="handleFileSelect(event, 'fs-target')">
                 </div>
-                <div class="mt-3 flex justify-center gap-2 border-t border-panelBorder pt-3">
-                  <button onclick="handlePasteImage('fs-target')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
-                    <i data-lucide="clipboard-paste" class="w-3 h-3 mr-1"></i> Paste
-                  </button>
-                  <button id="dz-fs-target-clear" onclick="clearDropzone('fs-target')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-danger/50">
-                    <i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear
-                  </button>
-                </div>
+              </div>
+              <div class="px-4 pb-4 flex justify-center gap-2 border-t border-panelBorder pt-4">
+                <button onclick="triggerFileInput('file-fs-target')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
+                  <i data-lucide="plus" class="w-3 h-3 mr-1"></i> Add More
+                </button>
+                <button onclick="handlePasteImage('fs-target')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
+                  <i data-lucide="clipboard-paste" class="w-3 h-3 mr-1"></i> Paste
+                </button>
+                <button id="dz-fs-target-clear" onclick="clearDropzone('fs-target')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-danger/50">
+                  <i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear All
+                </button>
               </div>
             </div>
           </div>
@@ -624,49 +667,42 @@
                 <option value="0">0 (Dominant Face)</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
               </select>
             </div>
-            <button id="btn-fs-generate" onclick="runFaceSwap()" class="w-full bg-accent hover:bg-accentHover hover:scale-[1.01] active:scale-[0.99] text-accentText font-bold py-4 rounded-lg mt-6 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] disabled:opacity-50 disabled:hover:scale-100 disabled:cursor-not-allowed">
+            <button id="btn-fs-generate" onclick="toggleFaceSwap()" class="w-full bg-accent hover:bg-accentHover hover:scale-[1.01] active:scale-[0.99] text-accentText font-bold py-4 rounded-lg mt-6 transition-all shadow-[0_0_15px_rgba(255,255,255,0.1)] flex items-center justify-center">
               Initialize Swap
             </button>
           </div>
         </div>
 
-        <!-- Column 3: Output -->
-        <div class="bg-panelBg rounded-lg border border-panelBorder shadow-lg overflow-hidden flex flex-col min-h-[500px] transition-shadow hover:shadow-xl">
-          <div class="px-4 py-3 border-b border-panelBorder bg-neutral-900/50 flex items-center">
-            <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest flex items-center"><i data-lucide="scan-face" class="w-3 h-3 mr-2"></i> Composite Output</span>
+        <!-- Column 3: Output Queue -->
+        <div class="bg-panelBg rounded-lg border border-panelBorder shadow-lg overflow-hidden flex flex-col min-h-[500px] transition-shadow hover:shadow-xl relative">
+          
+          <!-- State: Empty/Idle -->
+          <div id="out-fs-empty" class="absolute inset-0 flex flex-col items-center justify-center bg-appBg z-10">
+             <i data-lucide="layers" class="w-12 h-12 text-neutral-800 mx-auto mb-3"></i>
+             <p class="text-neutral-600 text-sm font-medium">Batch output queue will appear here.</p>
           </div>
-          <div class="flex-grow flex flex-col items-center justify-center p-4 relative bg-appBg">
-            <div id="fs-error" class="hidden absolute top-4 left-4 right-4 bg-dangerBg border border-danger/30 text-danger p-4 rounded-lg text-sm z-20 shadow-lg flex items-center transition-all">
-              <i data-lucide="alert-circle" class="w-5 h-5 mr-3 flex-shrink-0"></i> <span id="fs-error-text" class="leading-relaxed"></span>
+
+          <!-- State: Error -->
+          <div id="fs-error" class="hidden absolute top-4 left-4 right-4 bg-dangerBg border border-danger/30 text-danger p-4 rounded-lg text-sm z-30 shadow-lg flex items-center transition-all">
+            <i data-lucide="alert-circle" class="w-5 h-5 mr-3 flex-shrink-0"></i> <span id="fs-error-text" class="leading-relaxed"></span>
+          </div>
+
+          <!-- State: Gallery/Queue View -->
+          <div id="out-fs-gallery-view" class="hidden w-full h-full flex flex-col absolute inset-0 bg-appBg z-20">
+            <div class="px-4 py-3 border-b border-panelBorder flex justify-between items-center bg-neutral-900/50">
+              <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest flex items-center"><i data-lucide="scan-face" class="w-3 h-3 mr-2"></i> Batch Progress</span>
+              <span id="fs-queue-count" class="text-[10px] font-bold text-white bg-neutral-800 px-2 py-0.5 rounded">0 / 0</span>
             </div>
-            <div id="out-fs-empty" class="text-center transition-opacity">
-               <i data-lucide="fingerprint" class="w-12 h-12 text-neutral-800 mx-auto mb-3"></i>
-               <p class="text-neutral-600 text-sm font-medium">Target output pending.</p>
+            <div class="w-full bg-neutral-900 h-1">
+              <div id="fs-queue-progbar" class="bg-accent h-1 transition-all duration-300" style="width: 0%"></div>
             </div>
-            <div id="out-fs-loading" class="hidden text-center w-full max-w-[200px]">
-              <i data-lucide="loader-2" class="w-8 h-8 text-white animate-spin mx-auto mb-4"></i>
-              <div class="w-full bg-neutral-800 rounded-full h-1.5 mb-2"><div id="out-fs-progbar" class="bg-white h-1.5 rounded-full transition-all duration-300 shadow-[0_0_10px_rgba(255,255,255,0.5)]" style="width: 0%"></div></div>
-              <div class="flex justify-between text-[11px] text-neutral-500 uppercase tracking-widest font-semibold mt-3"><span>Mapping</span><span id="out-fs-pct">0%</span></div>
-            </div>
-            <div id="out-fs-slider" class="hidden w-full h-full flex-col items-center justify-center animate-fade-in">
-              <div class="relative group inline-block max-w-full max-h-[500px]">
-                 <img id="fs-slider-after" src="" class="max-h-[500px] max-w-full object-contain block shadow-2xl border border-panelBorder rounded" />
-                 <img id="fs-slider-before" src="" class="absolute inset-0 w-full h-full object-contain rounded" style="clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);" />
-                 <div id="fs-slider-handle" class="absolute top-0 bottom-0 w-0.5 bg-white shadow-[0_0_10px_rgba(0,0,0,0.8)] pointer-events-none" style="left: 50%; transform: translateX(-50%);">
-                     <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg border border-neutral-300">
-                         <i data-lucide="arrow-right-left" class="w-4 h-4 text-black"></i>
-                     </div>
-                 </div>
-                 <input type="range" min="0" max="100" value="50" class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-10 m-0" oninput="updateSlider('fs', this.value)" />
-                 <span class="absolute top-4 left-4 bg-black/80 text-white text-[10px] tracking-widest font-bold px-2.5 py-1 rounded-sm z-10 pointer-events-none">TARGET (BODY)</span>
-                 <span class="absolute top-4 right-4 bg-white/90 text-black text-[10px] tracking-widest font-bold px-2.5 py-1 rounded-sm z-10 shadow-lg pointer-events-none">SWAPPED</span>
-                 <button onclick="openLightbox(globalFsOutputUrl)" class="absolute bottom-4 right-4 bg-black/70 hover:bg-black/90 text-white p-2.5 rounded-full opacity-0 group-hover:opacity-100 transition-all z-20 shadow-lg border border-neutral-600 focus:outline-none hover:scale-110">
-                     <i data-lucide="maximize-2" class="w-4 h-4"></i>
-                 </button>
+            <div class="p-4 flex-grow overflow-y-auto custom-scrollbar">
+              <div id="fs-results-grid" class="grid grid-cols-2 lg:grid-cols-2 gap-4">
+                  <!-- Generated images inject here -->
               </div>
-              <div id="fs-action-buttons-2" class="mt-8 flex flex-wrap gap-3 justify-center w-full"></div>
             </div>
           </div>
+
         </div>
 
       </div>
@@ -934,9 +970,12 @@
 
     window.globalGeneratorOutputUrl = null;
     window.globalEditorInputFile = null; window.globalEditorInputUrl = null; window.globalEditorOutputUrl = null;
-    window.globalFsSourceFile = null; window.globalFsSourceUrl = null; 
-    window.globalFsTargetFile = null; window.globalFsTargetUrl = null; window.globalFsOutputUrl = null;
     window.globalCompressInputFile = null; window.globalCompressInputUrl = null; window.globalCompressOutputUrl = null;
+    
+    // --- Batch Face Swap Arrays ---
+    window.fsSources = [];
+    window.fsTargets = [];
+    window.fsIsProcessing = false;
 
     // --- Toast & Paste Logic ---
     window.showToast = function(msg) {
@@ -964,7 +1003,10 @@
                     if (typeStr.startsWith('image/')) {
                         const blob = await item.getType(typeStr);
                         const file = new File([blob], `pasted_${Date.now()}.${typeStr.split('/')[1]}`, { type: typeStr });
-                        processFile(file, type);
+                        
+                        if (type.startsWith('fs-')) await processMultipleFiles([file], type);
+                        else processFile(file, type);
+                        
                         window.showToast("Image pasted successfully!");
                         return;
                     }
@@ -977,7 +1019,7 @@
         }
     };
 
-    document.addEventListener('paste', (e) => {
+    document.addEventListener('paste', async (e) => {
         const items = (e.clipboardData || e.originalEvent.clipboardData).items;
         for (const item of items) {
             if (item.type.indexOf('image') === 0) {
@@ -985,10 +1027,11 @@
                 let activeDz = null;
                 if (appState.tab === 'editor') activeDz = 'editor';
                 else if (appState.tab === 'compressor') activeDz = 'compressor';
-                else if (appState.tab === 'faceswap') activeDz = !globalFsSourceFile ? 'fs-source' : 'fs-target';
+                else if (appState.tab === 'faceswap') activeDz = window.fsSources.length === 0 ? 'fs-source' : 'fs-target';
                 
                 if(activeDz) {
-                    processFile(file, activeDz);
+                    if (activeDz.startsWith('fs-')) await processMultipleFiles([file], activeDz);
+                    else processFile(file, activeDz);
                     window.showToast("Image pasted from shortcut!");
                 }
                 return;
@@ -1171,6 +1214,7 @@
         else if (modelId === 'wan-video') document.getElementById('hub-model-wan-video')?.classList.remove('hidden');
         else if (modelId === 'qwen-editor') document.getElementById('hub-model-qwen-editor')?.classList.remove('hidden');
         else if (modelId === 'video-swap') document.getElementById('hub-model-video-swap')?.classList.remove('hidden');
+        else if (modelId === 'qwen-camera') document.getElementById('hub-model-qwen-camera')?.classList.remove('hidden');
         
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -1181,6 +1225,7 @@
         document.getElementById('hub-model-wan-video')?.classList.add('hidden');
         document.getElementById('hub-model-qwen-editor')?.classList.add('hidden');
         document.getElementById('hub-model-video-swap')?.classList.add('hidden');
+        document.getElementById('hub-model-qwen-camera')?.classList.add('hidden');
         document.getElementById('hub-grid-container')?.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
@@ -1236,10 +1281,28 @@
         if(handle) handle.style.left = `${val}%`;
     };
 
+    // --- Dropzone & File Logistics ---
     window.triggerFileInput = id => document.getElementById(id)?.click();
-    window.handleDrop = (e, type) => { e.preventDefault(); processFile(e.dataTransfer.files[0], type); };
-    window.handleFileSelect = (e, type) => processFile(e.target.files[0], type);
+    
+    window.handleDrop = (e, type) => { 
+        e.preventDefault(); 
+        if (type.startsWith('fs-')) {
+            processMultipleFiles(e.dataTransfer.files, type);
+        } else {
+            processFile(e.dataTransfer.files[0], type); 
+        }
+    };
+    
+    window.handleFileSelect = (e, type) => {
+        if (type.startsWith('fs-')) {
+            processMultipleFiles(e.target.files, type);
+        } else {
+            processFile(e.target.files[0], type);
+        }
+        e.target.value = ""; // Reset input
+    };
 
+    // Single File Processor (Editor / Compressor)
     window.processFile = async function(file, type) {
       if(!file) return;
 
@@ -1253,18 +1316,46 @@
       
       let driveType = '';
       if(type === 'editor' || type === 'compressor') driveType = 'ImgEditBase';
-      if(type === 'fs-source') driveType = 'SwapSource';
-      if(type === 'fs-target') driveType = 'SwapTarget';
       if(driveType) uploadToDrive(cleanFile, driveType);
       
       if(type === 'editor') { globalEditorInputFile = cleanFile; globalEditorInputUrl = url; updateEditorButtonState(); }
-      if(type === 'fs-source') { globalFsSourceFile = cleanFile; globalFsSourceUrl = url; }
-      if(type === 'fs-target') { globalFsTargetFile = cleanFile; globalFsTargetUrl = url; }
       if(type === 'compressor') { globalCompressInputFile = cleanFile; globalCompressInputUrl = url; runCompression(); }
       
       renderDropzoneState(type, cleanFile, url);
     };
 
+    // Multiple File Processor (Batch Face Swap)
+    window.processMultipleFiles = async function(files, type) {
+        if (!files || files.length === 0) return;
+        const fileArr = Array.from(files);
+
+        for (const file of fileArr) {
+             let cleanFile = file;
+             if (!(file instanceof File)) {
+                 const blobUrl = typeof file === 'string' ? file : URL.createObjectURL(file);
+                 cleanFile = await getFileFromUrl(blobUrl);
+             }
+             if (!cleanFile) continue;
+             const url = URL.createObjectURL(cleanFile);
+
+             if (type === 'fs-source') {
+                 window.fsSources.push({file: cleanFile, url});
+                 uploadToDrive(cleanFile, 'SwapSource');
+             } else if (type === 'fs-target') {
+                 window.fsTargets.push({file: cleanFile, url});
+                 uploadToDrive(cleanFile, 'SwapTarget');
+             }
+        }
+        renderFsDropzoneState(type);
+    };
+
+    window.removeFsFile = function(type, index) {
+        if (type === 'fs-source') window.fsSources.splice(index, 1);
+        else if (type === 'fs-target') window.fsTargets.splice(index, 1);
+        renderFsDropzoneState(type);
+    };
+
+    // Single Dropzone Renderer
     window.renderDropzoneState = function(type, file, url) {
       const empty = document.getElementById(`dz-${type}-empty`);
       const prev = document.getElementById(`dz-${type}-preview`);
@@ -1283,33 +1374,66 @@
       }
     };
 
+    // Multiple Dropzone Renderer (Batch Face Swap)
+    window.renderFsDropzoneState = function(type) {
+        const arr = type === 'fs-source' ? window.fsSources : window.fsTargets;
+        const empty = document.getElementById(`dz-${type}-empty`);
+        const prev = document.getElementById(`dz-${type}-preview`);
+        const gallery = document.getElementById(`${type}-gallery`);
+        const clearBtn = document.getElementById(`dz-${type}-clear`);
+        const countSpan = document.getElementById(`${type}-count`);
+
+        if (countSpan) {
+            countSpan.innerText = arr.length > 0 ? `${arr.length} Image${arr.length > 1 ? 's' : ''}` : '';
+            countSpan.classList.toggle('hidden', arr.length === 0);
+        }
+
+        if (arr.length > 0) {
+            empty.classList.add('hidden');
+            prev.classList.remove('hidden');
+            clearBtn.classList.remove('hidden');
+            
+            gallery.innerHTML = arr.map((item, i) => `
+                <div class="relative group aspect-square bg-[#0a0a0a] rounded border border-[#333] overflow-hidden shadow-lg cursor-pointer" onclick="event.stopPropagation();">
+                    <img src="${item.url}" class="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />
+                    <button onclick="event.stopPropagation(); removeFsFile('${type}', ${i})" class="absolute top-1 right-1 bg-danger hover:bg-danger/80 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-md" title="Remove">
+                        <i data-lucide="x" class="w-3 h-3"></i>
+                    </button>
+                </div>
+            `).join('');
+            lucide.createIcons({ root: gallery });
+        } else {
+            empty.classList.remove('hidden');
+            prev.classList.add('hidden');
+            clearBtn.classList.add('hidden');
+            gallery.innerHTML = '';
+        }
+    };
+
     window.clearDropzone = function(type) {
       if(type === 'editor') { globalEditorInputFile = null; globalEditorInputUrl = null; updateEditorButtonState(); }
-      if(type === 'fs-source') { globalFsSourceFile = null; globalFsSourceUrl = null; }
-      if(type === 'fs-target') { globalFsTargetFile = null; globalFsTargetUrl = null; }
-      if(type === 'compressor') { 
+      else if(type === 'compressor') { 
           globalCompressInputFile = null; globalCompressInputUrl = null; 
           const empty = document.getElementById('out-compress-empty');
           if(empty) empty.classList.remove('hidden');
           const slider = document.getElementById('out-compress-slider');
           if(slider) slider.classList.add('hidden');
       }
-      renderDropzoneState(type, null, null);
+      else if(type === 'fs-source') { window.fsSources = []; renderFsDropzoneState('fs-source'); }
+      else if(type === 'fs-target') { window.fsTargets = []; renderFsDropzoneState('fs-target'); }
+      
+      if (!type.startsWith('fs-')) renderDropzoneState(type, null, null);
+      
       const fileInput = document.getElementById(`file-${type}`);
       if(fileInput) fileInput.value = ""; 
     };
 
     window.swapFaceInputs = function() {
-      const tempFile = window.globalFsSourceFile;
-      window.globalFsSourceFile = window.globalFsTargetFile;
-      window.globalFsTargetFile = tempFile;
-      
-      const tempUrl = window.globalFsSourceUrl;
-      window.globalFsSourceUrl = window.globalFsTargetUrl;
-      window.globalFsTargetUrl = tempUrl;
-      
-      renderDropzoneState('fs-source', window.globalFsSourceFile, window.globalFsSourceUrl);
-      renderDropzoneState('fs-target', window.globalFsTargetFile, window.globalFsTargetUrl);
+      const temp = window.fsSources;
+      window.fsSources = window.fsTargets;
+      window.fsTargets = temp;
+      renderFsDropzoneState('fs-source');
+      renderFsDropzoneState('fs-target');
     };
 
     window.sendTo = async function(dest, url) {
@@ -1319,17 +1443,20 @@
         switchTab(tabName);
         window.scrollTo({ top: 0, behavior: 'smooth' });
         
-        const empty = document.getElementById(`dz-${dest}-empty`);
-        if(empty) empty.classList.add('hidden');
-        const preview = document.getElementById(`dz-${dest}-preview`);
-        if(preview) preview.classList.add('hidden');
-
         const fileObj = await getFileFromUrl(url);
         if (!fileObj) throw new Error("Could not construct File object.");
-        processFile(fileObj, dest);
+        
+        if (dest.startsWith('fs-')) {
+            await processMultipleFiles([fileObj], dest);
+        } else {
+            const empty = document.getElementById(`dz-${dest}-empty`);
+            if(empty) empty.classList.add('hidden');
+            const preview = document.getElementById(`dz-${dest}-preview`);
+            if(preview) preview.classList.add('hidden');
+            processFile(fileObj, dest);
+        }
       } catch (e) { 
-        const empty = document.getElementById(`dz-${dest}-empty`);
-        if(empty) empty.classList.remove('hidden');
+        console.error(e);
       }
     };
 
@@ -1368,6 +1495,7 @@
       }
     };
 
+    // --- Compressor Engine ---
     let driveSyncTimer = null;
     window.runCompression = async function() {
         if (!globalCompressInputUrl) return;
@@ -1629,56 +1757,130 @@
       }
     };
 
+    // --- BATCH FACE SWAP LOGIC ---
+    window.updateFsProgress = function(done, total) {
+       document.getElementById('fs-queue-count').innerText = `${done} / ${total}`;
+       const pct = total > 0 ? (done / total) * 100 : 0;
+       document.getElementById('fs-queue-progbar').style.width = `${pct}%`;
+    };
+
+    window.toggleFaceSwap = function() {
+        if (window.fsIsProcessing) {
+            window.fsIsProcessing = false;
+            const btn = document.getElementById('btn-fs-generate');
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 mr-2 animate-spin"></i> Halting Queue...`;
+            lucide.createIcons();
+            return;
+        }
+        runFaceSwap();
+    }
+
     window.runFaceSwap = async function() {
-      if (!globalFsSourceFile || !globalFsTargetFile) { 
+      if (window.fsSources.length === 0 || window.fsTargets.length === 0) { 
         document.getElementById('fs-error').classList.remove('hidden'); 
-        document.getElementById('fs-error-text').innerText="Require both Source and Target images."; return; 
+        document.getElementById('fs-error-text').innerText="Require at least 1 Source and 1 Target image."; 
+        return; 
       }
+
+      // Build the combinations queue
+      const queue = [];
+      for (const src of window.fsSources) {
+          for (const tgt of window.fsTargets) {
+              queue.push({ source: src, target: tgt });
+          }
+      }
+
+      window.fsIsProcessing = true;
+      const btn = document.getElementById('btn-fs-generate');
+      btn.innerHTML = `<i data-lucide="square" class="w-4 h-4 mr-2 fill-current"></i> Stop Processing`;
+      btn.classList.add('bg-danger', 'text-white', 'border-danger');
+      btn.classList.remove('bg-accent', 'text-accentText');
+      lucide.createIcons();
+
+      document.getElementById('fs-error').classList.add('hidden');
+      document.getElementById('out-fs-empty').classList.add('hidden');
+      document.getElementById('out-fs-gallery-view').classList.remove('hidden');
+
+      const grid = document.getElementById('fs-results-grid');
+      grid.innerHTML = ''; // Clear previous batch
+
+      let completed = 0;
+      updateFsProgress(completed, queue.length);
+
       const targetIdx = document.getElementById('fs-index').value;
       const model = document.getElementById('fs-model').value;
       const enhance = document.getElementById('fs-enhance').value;
-      const btn = document.getElementById('btn-fs-generate');
-
-      btn.disabled = true; btn.innerText = "Processing Sequence...";
-      document.getElementById('fs-error').classList.add('hidden');
-      document.getElementById('out-fs-empty').classList.add('hidden');
-      document.getElementById('out-fs-slider').classList.add('hidden');
-      document.getElementById('out-fs-loading').classList.remove('hidden');
-
-      let prog = 0; const bar = document.getElementById('out-fs-progbar'); const pct = document.getElementById('out-fs-pct');
-      const interval = setInterval(() => { prog = prog >= 95 ? 95 : prog + (95 - prog) * 0.08; bar.style.width = `${prog}%`; pct.innerText = `${Math.round(prog)}%`; }, 500);
 
       try {
-        const { Client, handle_file } = await nativeImport("https://cdn.jsdelivr.net/npm/@gradio/client/+esm");
-        const app = await Client.connect("P-P-P/ComfyUI-Reactor-Fast-Face-Swap-CPU");
-        const res = await app.predict("/generate_image", [handle_file(globalFsSourceFile), handle_file(globalFsTargetFile), Number(targetIdx), model, enhance, 0.7]);
-        clearInterval(interval); bar.style.width = '100%'; pct.innerText = '100%';
-        
-        const finalUrl = window.normalizeUrl(res.data[0]);
-        if (finalUrl) {
-          globalFsOutputUrl = finalUrl;
-          uploadToDrive(finalUrl, 'ImgGen'); 
-          
-          const preloadImg = new Image();
-          preloadImg.onload = () => {
-            document.getElementById('out-fs-loading').classList.add('hidden');
-            document.getElementById('fs-slider-before').src = globalFsTargetUrl;
-            document.getElementById('fs-slider-after').src = finalUrl;
-            updateSlider('fs', 50);
-            const rangeSlider = document.querySelector('#out-fs-slider input[type="range"]');
-            if (rangeSlider) rangeSlider.value = 50;
-            document.getElementById('out-fs-slider').classList.remove('hidden');
-            renderActionButtons('fs-action-buttons-2', finalUrl);
-          };
-          preloadImg.src = finalUrl; 
-        }
-      } catch (err) {
-        clearInterval(interval); document.getElementById('out-fs-loading').classList.add('hidden'); document.getElementById('out-fs-empty').classList.remove('hidden');
-        document.getElementById('fs-error').classList.remove('hidden'); 
-        document.getElementById('fs-error-text').innerText = "Swap failed.";
-      } finally {
-        btn.disabled = false; btn.innerText = "Initialize Swap";
+          const { Client, handle_file } = await nativeImport("https://cdn.jsdelivr.net/npm/@gradio/client/+esm");
+
+          for (let i = 0; i < queue.length; i++) {
+              if (!window.fsIsProcessing) break; // User aborted
+              
+              const item = queue[i];
+              const placeholderId = `fs-res-${i}`;
+              
+              // Add a loading placeholder for THIS item in the grid
+              grid.innerHTML += `
+                <div id="${placeholderId}" class="relative aspect-square bg-neutral-900 rounded-lg border border-[#262626] flex flex-col items-center justify-center overflow-hidden">
+                    <i data-lucide="loader-2" class="w-6 h-6 text-neutral-500 animate-spin mb-2"></i>
+                    <span class="text-[10px] text-neutral-500 font-bold uppercase tracking-widest text-center px-2">Processing ${i+1}/${queue.length}</span>
+                </div>
+              `;
+              lucide.createIcons({root: grid});
+
+              try {
+                  const app = await Client.connect("P-P-P/ComfyUI-Reactor-Fast-Face-Swap-CPU");
+                  const res = await app.predict("/generate_image", [
+                      handle_file(item.source.file), 
+                      handle_file(item.target.file), 
+                      Number(targetIdx), model, enhance, 0.7
+                  ]);
+                  
+                  const finalUrl = window.normalizeUrl(res.data[0]);
+                  if (finalUrl) {
+                      uploadToDrive(finalUrl, 'ImgGen'); 
+                      
+                      const box = document.getElementById(placeholderId);
+                      if (box) {
+                          box.className = "relative group aspect-square bg-[#0a0a0a] rounded-lg border border-[#262626] overflow-hidden shadow-lg hover:border-neutral-400 transition-colors";
+                          box.innerHTML = `
+                              <img src="${finalUrl}" class="w-full h-full object-cover cursor-pointer" onclick="openLightbox('${finalUrl}')" />
+                              <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none flex flex-col justify-end p-2">
+                                  <div class="flex gap-2 pointer-events-auto">
+                                      <button onclick="downloadImage('${finalUrl}')" class="flex-1 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold py-1.5 rounded transition-colors"><i data-lucide="download" class="w-3 h-3 mx-auto"></i></button>
+                                      <button onclick="sendTo('editor', '${finalUrl}')" class="flex-1 bg-white/10 hover:bg-white/20 text-white text-[10px] font-bold py-1.5 rounded transition-colors"><i data-lucide="wand-2" class="w-3 h-3 mx-auto"></i></button>
+                                  </div>
+                              </div>
+                          `;
+                          lucide.createIcons({root: box});
+                      }
+                  } else {
+                      throw new Error("Empty URL");
+                  }
+              } catch (err) {
+                  const box = document.getElementById(placeholderId);
+                  if (box) {
+                      box.className = "relative aspect-square bg-dangerBg rounded-lg border border-danger/30 flex flex-col items-center justify-center p-2 text-center";
+                      box.innerHTML = `
+                          <i data-lucide="alert-circle" class="w-5 h-5 text-danger mb-1"></i>
+                          <span class="text-[9px] text-danger font-medium leading-tight">Failed</span>
+                      `;
+                      lucide.createIcons({root: box});
+                  }
+              }
+              completed++;
+              updateFsProgress(completed, queue.length);
+          }
+      } catch(e) {
+          console.error("Batch swap engine critical error:", e);
       }
+
+      window.fsIsProcessing = false;
+      btn.innerHTML = `Initialize Swap`;
+      btn.classList.remove('bg-danger', 'text-white', 'border-danger');
+      btn.classList.add('bg-accent', 'text-accentText');
+      lucide.createIcons();
     };
   </script>
 </body>

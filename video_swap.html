@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyperswap Video Iframe</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #141414; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 16px; width: 16px; border-radius: 50%; background: #ffffff; cursor: ew-resize; box-shadow: 0 0 10px rgba(255,255,255,0.5); margin-top: -5px; transition: transform 0.1s ease; }
+        input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+        input[type=range] { -webkit-appearance: none; background: transparent; }
+        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #333; border-radius: 3px; }
+    </style>
+</head>
+<body class="bg-[#0a0a0a] text-[#ededed] font-sans selection:bg-neutral-300 selection:text-black p-4 md:p-8">
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+        
+        <!-- Controls Column -->
+        <div class="flex flex-col gap-6 w-full">
+            
+            <!-- Source Image (Face) -->
+            <div class="bg-[#141414] rounded-lg border border-[#262626] shadow-lg flex flex-col overflow-hidden">
+                <div class="px-4 py-3 border-b border-[#262626] bg-neutral-900/50 flex items-center">
+                    <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Source Image (Face)</span>
+                </div>
+                <div class="p-4">
+                    <div id="dz-source" class="w-full h-40 border border-dashed border-[#333] rounded-lg bg-[#1a1a1a] flex flex-col items-center justify-center overflow-hidden transition-colors cursor-pointer hover:border-neutral-500 relative group" onclick="triggerFileInput('file-source')" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'source')">
+                        <div id="dz-source-empty" class="text-center p-4">
+                            <i data-lucide="upload" class="w-5 h-5 text-neutral-400 mx-auto mb-2"></i>
+                            <p class="text-white text-sm font-semibold">Drop Face Image</p>
+                        </div>
+                        <div id="dz-source-preview" class="hidden absolute inset-0 w-full h-full p-2">
+                            <img id="dz-source-img" src="" class="w-full h-full object-contain rounded">
+                        </div>
+                        <input type="file" id="file-source" class="hidden" accept="image/*" onchange="handleFileSelect(event, 'source')">
+                    </div>
+                    <div class="mt-3 flex justify-center gap-2 border-t border-[#333] pt-3">
+                        <button onclick="handlePasteImage('source')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-[#1a1a1a] border border-[#333] px-2.5 py-1 rounded hover:border-neutral-500"><i data-lucide="clipboard-paste" class="w-3 h-3 mr-1"></i> Paste</button>
+                        <button id="dz-source-clear" onclick="clearDropzone('source')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-[#ff4444] transition-colors flex items-center bg-[#1a1a1a] border border-[#333] px-2.5 py-1 rounded hover:border-[#ff4444]/50"><i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Target Video (Body) & Trimmer -->
+            <div class="bg-[#141414] rounded-lg border border-[#262626] shadow-lg flex flex-col overflow-hidden">
+                <div class="px-4 py-3 border-b border-[#262626] bg-neutral-900/50 flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Target Video (Body)</span>
+                </div>
+                <div class="p-4">
+                    <div id="dz-target" class="w-full h-40 border border-dashed border-[#333] rounded-lg bg-[#1a1a1a] flex flex-col items-center justify-center overflow-hidden transition-colors cursor-pointer hover:border-neutral-500 relative group" onclick="triggerFileInput('file-target')" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'target')">
+                        <div id="dz-target-empty" class="text-center p-4">
+                            <i data-lucide="video" class="w-5 h-5 text-neutral-400 mx-auto mb-2"></i>
+                            <p class="text-white text-sm font-semibold">Drop Target Video (MP4)</p>
+                        </div>
+                        <div id="dz-target-preview" class="hidden absolute inset-0 w-full h-full p-2 flex items-center justify-center bg-black">
+                            <video id="dz-target-vid" class="max-w-full max-h-full" controls playsinline></video>
+                        </div>
+                        <input type="file" id="file-target" class="hidden" accept="video/mp4,video/webm,video/mov" onchange="handleFileSelect(event, 'target')">
+                    </div>
+                    
+                    <div class="mt-3 flex justify-center gap-2 border-t border-[#333] pt-3">
+                        <button id="dz-target-clear" onclick="clearDropzone('target')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-[#ff4444] transition-colors flex items-center bg-[#1a1a1a] border border-[#333] px-2.5 py-1 rounded hover:border-[#ff4444]/50"><i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear</button>
+                    </div>
+
+                    <!-- Custom HTML5 Trimmer -->
+                    <div id="trimmer-panel" class="hidden mt-4 bg-[#0a0a0a] rounded-lg p-4 border border-[#333]">
+                        <p class="text-xs font-bold text-neutral-400 mb-4 flex items-center"><i data-lucide="scissors" class="w-3.5 h-3.5 mr-2"></i> Custom Video Trimmer</p>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-[10px] font-mono text-neutral-500 mb-1"><span>START</span><span id="start-val" class="text-white">0.0s</span></div>
+                                <input type="range" id="start-slider" min="0" max="100" step="0.1" value="0" class="w-full">
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-[10px] font-mono text-neutral-500 mb-1"><span>END</span><span id="end-val" class="text-white">0.0s</span></div>
+                                <input type="range" id="end-slider" min="0" max="100" step="0.1" value="0" class="w-full">
+                            </div>
+                            <button onclick="applyTrim()" id="trimBtn" class="w-full bg-[#1a1a1a] border border-[#333] hover:border-white text-xs font-bold py-2 rounded transition-colors mt-2 text-white flex justify-center items-center">
+                                <span id="trimBtnText">Apply Trim</span>
+                                <i data-lucide="loader-2" id="trimLoading" class="w-3 h-3 ml-2 animate-spin hidden"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API Settings -->
+            <div class="bg-[#141414] rounded-lg border border-[#262626] p-5 shadow-lg">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <label class="block text-[10px] font-bold text-neutral-400 mb-2 uppercase tracking-widest">Model</label>
+                        <select id="swap-model" class="w-full bg-[#1a1a1a] border border-[#333] rounded p-2 text-xs text-white focus:outline-none">
+                            <option value="hyperswap_1a_256.onnx">hyperswap_1a_256</option>
+                            <option value="hyperswap_1b_256.onnx" selected>hyperswap_1b_256</option>
+                            <option value="hyperswap_1c_256.onnx">hyperswap_1c_256</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-neutral-400 mb-2 uppercase tracking-widest">Face Index</label>
+                        <select id="face-index" class="w-full bg-[#1a1a1a] border border-[#333] rounded p-2 text-xs text-white focus:outline-none">
+                            <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between border-t border-[#333] pt-4 mt-2">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="use-audio" class="rounded bg-[#1a1a1a] border-[#333] text-white focus:ring-0 w-4 h-4" checked>
+                        <label class="text-[10px] font-bold text-neutral-400 uppercase tracking-widest">Keep Audio</label>
+                    </div>
+                    
+                    <button id="generateBtn" onclick="handleGenerate()" class="bg-white hover:bg-neutral-200 text-black font-bold py-2.5 px-6 rounded flex items-center transition-colors disabled:opacity-50">
+                        <i data-lucide="video" class="w-3.5 h-3.5 mr-2" id="btnIconDefault"></i>
+                        <i data-lucide="loader-2" class="w-3.5 h-3.5 mr-2 animate-spin hidden" id="btnIconLoading"></i>
+                        <span id="btnText">Swap Video</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="errorContainer" class="hidden bg-[#2a0808] border border-[#ff4444]/30 text-[#ff4444] p-4 rounded-lg flex items-start gap-3 shadow-lg">
+                <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                <p id="errorText" class="text-xs font-medium"></p>
+            </div>
+        </div>
+
+        <!-- Output Column -->
+        <div class="bg-[#141414] border border-[#262626] rounded-xl p-5 flex flex-col items-center justify-center min-h-[500px] h-full relative overflow-hidden group shadow-lg">
+            <div id="idleState" class="flex flex-col items-center text-neutral-600">
+                <i data-lucide="film" class="w-16 h-16 mb-4 opacity-40"></i>
+                <p class="text-sm font-medium">Your swapped video will appear here.</p>
+            </div>
+
+            <div id="loadingState" class="hidden flex flex-col items-center gap-4 text-white w-full max-w-[200px]">
+                <i data-lucide="loader-2" class="w-10 h-10 animate-spin text-white"></i>
+                <div class="w-full bg-neutral-800 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-white h-1.5 rounded-full transition-all duration-300" style="width: 100%"></div>
+                </div>
+                <p class="text-[10px] font-bold uppercase tracking-widest text-neutral-400 animate-pulse mt-1">Processing Frames...</p>
+                <div id="routingNotifier" class="absolute top-4 right-4 bg-[#0a0a0a] border border-[#262626] text-[10px] text-white px-3 py-1.5 rounded flex items-center shadow-lg font-bold tracking-widest uppercase hidden">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse mr-2"></span> ROUTED: <span id="routingUser" class="ml-1 text-green-400 font-mono"></span>
+                </div>
+            </div>
+
+            <div id="resultState" class="hidden w-full h-full flex flex-col relative rounded-xl items-center justify-center">
+                <video id="generatedVideo" src="" controls autoplay loop class="max-w-full max-h-[500px] rounded border border-[#262626] shadow-2xl bg-black"></video>
+                <div class="mt-6 flex gap-2 justify-center w-full">
+                    <button onclick="downloadVideo()" class="bg-neutral-800 hover:bg-neutral-700 text-white text-xs py-2 px-4 rounded border border-[#262626] flex items-center"><i data-lucide="download" class="w-3.5 h-3.5 mr-2"></i> Save Video</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Global Toast -->
+    <div id="global-toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 bg-[#1a1a1a] text-white text-xs px-4 py-2 rounded shadow-lg z-[200] transition-opacity duration-300 opacity-0 pointer-events-none border border-[#333]"></div>
+
+    <script type="module">
+        const nativeImport = new Function('url', 'return import(url)');
+        lucide.createIcons();
+
+        let globalFsSourceFile = null;
+        let globalFsTargetFile = null;
+        let isGenerating = false;
+
+        // UI Handlers
+        window.showToast = (msg) => {
+            const toast = document.getElementById('global-toast');
+            toast.innerText = msg; toast.classList.remove('opacity-0');
+            setTimeout(() => toast.classList.add('opacity-0'), 3000);
+        };
+        const showError = (msg) => { document.getElementById('errorContainer').classList.remove('hidden'); document.getElementById('errorText').innerText = msg; };
+        const hideError = () => document.getElementById('errorContainer').classList.add('hidden');
+
+        // File Dropzone
+        window.triggerFileInput = id => document.getElementById(id).click();
+        window.handleDrop = (e, type) => { e.preventDefault(); processFile(e.dataTransfer.files[0], type); };
+        window.handleFileSelect = (e, type) => processFile(e.target.files[0], type);
+
+        window.processFile = (file, type) => {
+            if(!file) return;
+            const url = URL.createObjectURL(file);
+            
+            if(type === 'source') {
+                globalFsSourceFile = file;
+                document.getElementById('dz-source-img').src = url;
+                document.getElementById('dz-source-empty').classList.add('hidden');
+                document.getElementById('dz-source-preview').classList.remove('hidden');
+                document.getElementById('dz-source-clear').classList.remove('hidden');
+            } else if (type === 'target') {
+                globalFsTargetFile = file;
+                const vid = document.getElementById('dz-target-vid');
+                vid.src = url;
+                document.getElementById('dz-target-empty').classList.add('hidden');
+                document.getElementById('dz-target-preview').classList.remove('hidden');
+                document.getElementById('dz-target-clear').classList.remove('hidden');
+                
+                // Initialize Trimmer when video metadata loads
+                vid.onloadedmetadata = () => {
+                    const duration = vid.duration;
+                    const sSlider = document.getElementById('start-slider');
+                    const eSlider = document.getElementById('end-slider');
+                    sSlider.max = duration; eSlider.max = duration;
+                    sSlider.value = 0; eSlider.value = duration;
+                    document.getElementById('start-val').innerText = "0.0s";
+                    document.getElementById('end-val').innerText = duration.toFixed(1) + "s";
+                    document.getElementById('trimmer-panel').classList.remove('hidden');
+                };
+            }
+        };
+
+        window.clearDropzone = (type) => {
+            if(type === 'source') {
+                globalFsSourceFile = null;
+                document.getElementById('dz-source-empty').classList.remove('hidden');
+                document.getElementById('dz-source-preview').classList.add('hidden');
+                document.getElementById('dz-source-clear').classList.add('hidden');
+                document.getElementById('file-source').value = "";
+            } else if(type === 'target') {
+                globalFsTargetFile = null;
+                const vid = document.getElementById('dz-target-vid');
+                vid.pause(); vid.src = ""; vid.load();
+                document.getElementById('dz-target-empty').classList.remove('hidden');
+                document.getElementById('dz-target-preview').classList.add('hidden');
+                document.getElementById('dz-target-clear').classList.add('hidden');
+                document.getElementById('trimmer-panel').classList.add('hidden');
+                document.getElementById('file-target').value = "";
+            }
+        };
+
+        window.handlePasteImage = async function(type) {
+            try {
+                const clipboardItems = await navigator.clipboard.read();
+                for (const item of clipboardItems) {
+                    for (const typeStr of item.types) {
+                        if (typeStr.startsWith('image/')) {
+                            const blob = await item.getType(typeStr);
+                            const file = new File([blob], `pasted_${Date.now()}.${typeStr.split('/')[1]}`, { type: typeStr });
+                            processFile(file, type);
+                            window.showToast("Pasted successfully!");
+                            return;
+                        }
+                    }
+                }
+            } catch (err) { window.showToast("Clipboard access denied."); }
+        };
+
+        // Trimmer Sliders
+        const sSlider = document.getElementById('start-slider');
+        const eSlider = document.getElementById('end-slider');
+        const vid = document.getElementById('dz-target-vid');
+
+        sSlider.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if(val >= parseFloat(eSlider.value)) { val = parseFloat(eSlider.value) - 0.1; e.target.value = val; }
+            document.getElementById('start-val').innerText = val.toFixed(1) + "s";
+            vid.currentTime = val;
+        });
+
+        eSlider.addEventListener('input', (e) => {
+            let val = parseFloat(e.target.value);
+            if(val <= parseFloat(sSlider.value)) { val = parseFloat(sSlider.value) + 0.1; e.target.value = val; }
+            document.getElementById('end-val').innerText = val.toFixed(1) + "s";
+            vid.currentTime = val;
+        });
+
+        // HTML5 MediaRecorder Trimmer Engine
+        window.applyTrim = async () => {
+            if(!globalFsTargetFile) return;
+            const startTime = parseFloat(sSlider.value);
+            const endTime = parseFloat(eSlider.value);
+            
+            if(startTime === 0 && endTime === vid.duration) { window.showToast("Original video selected (no trim)."); return; }
+
+            const btnText = document.getElementById('trimBtnText');
+            const btnLoad = document.getElementById('trimLoading');
+            const trimBtn = document.getElementById('trimBtn');
+            btnText.innerText = "Trimming (Keep Tab Open)..."; btnLoad.classList.remove('hidden'); trimBtn.disabled = true;
+
+            try {
+                vid.currentTime = startTime;
+                await vid.play();
+                
+                const stream = vid.captureStream ? vid.captureStream() : vid.mozCaptureStream();
+                const recorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+                const chunks = [];
+                recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+                
+                recorder.onstop = () => {
+                    const blob = new Blob(chunks, { type: 'video/webm' });
+                    globalFsTargetFile = new File([blob], `trimmed_${Date.now()}.webm`, { type: 'video/webm' });
+                    
+                    // Reset UI with trimmed video
+                    const url = URL.createObjectURL(globalFsTargetFile);
+                    vid.src = url;
+                    vid.load();
+                    
+                    window.showToast("Video Trimmed successfully!");
+                    btnText.innerText = "Apply Trim"; btnLoad.classList.add('hidden'); trimBtn.disabled = false;
+                };
+
+                recorder.start();
+                setTimeout(() => {
+                    recorder.stop();
+                    vid.pause();
+                }, (endTime - startTime) * 1000);
+                
+            } catch(e) {
+                console.error(e);
+                window.showToast("Trimming failed (Browser restriction). Using original.");
+                btnText.innerText = "Apply Trim"; btnLoad.classList.add('hidden'); trimBtn.disabled = false;
+            }
+        };
+
+        // --- Drive Sync ---
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwqzODzdpNc8BLILC3ZnynKjiqO-fQFYNN078CTvQ9-n4xLvILuPNXdLItYfYZQIy0Ezw/exec";
+        
+        async function fetchSecureBlob(url) {
+            if (url.startsWith('blob:') || url.startsWith('data:')) {
+                let res = await fetch(url);
+                if (!res.ok) throw new Error("Failed to fetch local blob");
+                return await res.blob();
+            }
+            try { let res = await fetch(url); if (res.ok) return await res.blob(); } catch(e) { }
+            return null;
+        }
+
+        async function uploadToDrive(fileOrUrl, type) {
+            try {
+                let base64Data = ""; let fileName = `hyperswap_${Date.now()}.mp4`; let mimeType = "video/mp4";
+                if (typeof fileOrUrl === 'string') {
+                    const blob = await fetchSecureBlob(fileOrUrl);
+                    if(!blob) return;
+                    mimeType = blob.type || "video/mp4";
+                    base64Data = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result.split(',')[1]);
+                        reader.readAsDataURL(blob);
+                    });
+                } else return;
+
+                fetch(GAS_URL, {
+                    method: "POST", mode: "no-cors",
+                    headers: { "Content-Type": "text/plain" },
+                    body: JSON.stringify({ type: type, image: base64Data, fileName: fileName, mimeType: mimeType })
+                }).catch(e => console.error("Drive Sync Error:", e));
+            } catch (e) { }
+        }
+
+        window.downloadVideo = () => {
+            const url = document.getElementById('generatedVideo').src;
+            if(!url) return;
+            const a = document.createElement('a'); a.href = url; a.download = `hyperswap_${Date.now()}.mp4`;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        };
+
+        const setUIState = (state, user = null) => {
+            ['idleState', 'loadingState', 'resultState', 'routingNotifier'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            const btn = document.getElementById('generateBtn');
+            if (state === 'idle' || state === 'result') {
+                document.getElementById(state + 'State').classList.remove('hidden');
+                btn.disabled = false; btn.classList.remove('opacity-50');
+                document.getElementById('btnIconDefault').classList.remove('hidden'); document.getElementById('btnIconLoading').classList.add('hidden'); document.getElementById('btnText').innerText = state === 'idle' ? "Swap Video" : "Swap Video";
+            } else if (state === 'loading') {
+                document.getElementById('loadingState').classList.remove('hidden');
+                btn.disabled = true; btn.classList.add('opacity-50');
+                document.getElementById('btnIconDefault').classList.add('hidden'); document.getElementById('btnIconLoading').classList.remove('hidden'); document.getElementById('btnText').innerText = "Processing...";
+                if (user) { document.getElementById('routingUser').innerText = `@${user}`; document.getElementById('routingNotifier').classList.remove('hidden'); }
+            }
+        };
+
+        const fetchValidTokens = () => {
+            try { return JSON.parse(localStorage.getItem('hf_tokens') || '[]').filter(t => t.value.trim() !== '' && t.status !== 'exhausted' && t.status !== 'invalid'); } catch(e) { return []; }
+        };
+
+        const markTokenState = (id, state) => {
+            try {
+                let tkns = JSON.parse(localStorage.getItem('hf_tokens') || '[]');
+                let idx = tkns.findIndex(t => t.id === id);
+                if (idx !== -1) { tkns[idx].status = state; localStorage.setItem('hf_tokens', JSON.stringify(tkns)); window.parent.postMessage({ type: 'TOKEN_EXHAUSTED' }, '*'); }
+            } catch(e) {}
+        };
+
+        // Core API Logic
+        window.handleGenerate = async () => {
+            if (!globalFsSourceFile || !globalFsTargetFile) return showError("Both Face Image and Target Video are required.");
+            const tokens = fetchValidTokens();
+            if (tokens.length === 0) return showError('Vault empty. Add a Hugging Face token in the Hub.');
+
+            const swapModel = document.getElementById('swap-model').value;
+            const faceIndex = document.getElementById('face-index').value;
+            const useAudio = document.getElementById('use-audio').checked;
+
+            hideError();
+            let success = false;
+            let lastErr = null;
+
+            try {
+                const { Client, handle_file } = await nativeImport("https://cdn.jsdelivr.net/npm/@gradio/client/+esm");
+                
+                for (let i = 0; i < tokens.length; i++) {
+                    const t = tokens[i];
+                    setUIState('loading', t.user || `Token ${i+1}`);
+                    
+                    try {
+                        const app = await Client.connect("stocovac/ML_Hyperswap", { hf_token: t.value });
+                        
+                        const res = await app.predict("/generate_image", [
+                            handle_file(globalFsSourceFile), // source_image
+                            handle_file(globalFsTargetFile), // input_video
+                            faceIndex,                       // input_index
+                            "large-small",                   // input_faces_order
+                            swapModel,                       // swap_model
+                            false,                           // pingpong
+                            "0",                             // loop_count
+                            "1",                             // select_every_nth
+                            useAudio                         // use_audio
+                        ]);
+                        
+                        const vData = res.data[0];
+                        const finalUrl = typeof vData === 'object' ? (vData.url || vData.path) : vData;
+                        
+                        if (finalUrl) {
+                            uploadToDrive(finalUrl, 'ImgGen');
+                            document.getElementById('generatedVideo').src = finalUrl;
+                            success = true; break;
+                        } else throw new Error("Invalid format returned from API.");
+                        
+                    } catch (err) {
+                        lastErr = err;
+                        const s = String(err).toLowerCase();
+                        if (s.includes("401") || s.includes("invalid token")) markTokenState(t.id, 'invalid');
+                        if (!success && i < tokens.length - 1) { document.getElementById('routingUser').innerText = "SWAPPING..."; await new Promise(r => setTimeout(r, 1500)); }
+                    }
+                }
+                if (!success) throw new Error(lastErr?.message || "All tokens failed. Your IP may be rate-limited or tokens are out of quota.");
+            } catch (err) {
+                let msg = (err.message || "").replace(/<[^>]*>?/gm, '');
+                if(msg.includes("No GPU") || msg.includes("queues")) msg = "⏳ Server Busy: GPUs full. Wait a moment and try again.";
+                showError(msg); setUIState('idle');
+            } finally { if(success) setUIState('result'); }
+        };
+    </script>
+</body>
+</html>

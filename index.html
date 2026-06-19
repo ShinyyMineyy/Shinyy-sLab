@@ -13,20 +13,6 @@
   <meta name="robots" content="index, follow">
   <meta name="language" content="English">
 
-  <!-- Open Graph / Social Media Sharing -->
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="Shinyy's Lab | Fully Free AI Image Generator">
-  <meta property="og:description" content="A fully free AI suite with zero limits. Unlimited AI image generation, photo editing, and face swapping. No sign-up, no credits, 100% free forever.">
-  <meta property="og:site_name" content="Shinyy's Lab">
-
-  <!-- Twitter Card Tags -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:title" content="Shinyy's Lab | Fully Free AI Image Generator">
-  <meta property="twitter:description" content="A fully free AI suite with zero limits. Unlimited AI image generation, photo editing, and face swapping. No sign-up, no credits, 100% free forever.">
-  
-  <!-- Google AdSense -->
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9114008725096471" crossorigin="anonymous"></script>
-
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
@@ -75,20 +61,9 @@
       margin-top: -7px;
       transition: transform 0.1s ease;
     }
-    input[type=range]::-webkit-slider-thumb:hover {
-      transform: scale(1.1);
-    }
-    input[type=range] {
-      -webkit-appearance: none;
-      background: transparent;
-    }
-    input[type=range]::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 6px;
-      cursor: pointer;
-      background: #333;
-      border-radius: 3px;
-    }
+    input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
+    input[type=range] { -webkit-appearance: none; background: transparent; }
+    input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #333; border-radius: 3px; }
     
     /* Custom Scrollbar */
     ::-webkit-scrollbar { width: 8px; }
@@ -134,7 +109,7 @@
     </div>
   </header>
 
-  <main class="max-w-6xl mx-auto p-4 md:p-8 mt-4 w-full flex-grow relative">
+  <main class="max-w-6xl mx-auto p-4 md:p-8 mt-4 w-full flex-grow">
     
     <!-- ===================== PRO HUB TAB ===================== -->
     <div id="view-hub" class="space-y-6 mx-auto hidden animate-fade-in w-full">
@@ -215,11 +190,11 @@
           <!-- Box 3: Wan 2.2 Video -->
           <div onclick="openHubModel('wan-video')" class="md:col-span-1 lg:col-span-2 row-span-1 bg-[#141414] border border-[#262626] rounded-xl p-6 cursor-pointer hover:border-neutral-400 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all group relative overflow-hidden flex items-center justify-between">
             <div class="absolute -right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition-transform duration-500">
-              <i data-lucide="video" class="w-48 h-48 text-white"></i>
+              <i data-lucide="film" class="w-48 h-48 text-white"></i>
             </div>
             <div class="relative z-10 flex items-center w-full">
               <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white flex flex-shrink-0 items-center justify-center mr-5 group-hover:scale-110 transition-transform">
-                 <i data-lucide="video" class="w-6 h-6"></i>
+                 <i data-lucide="film" class="w-6 h-6"></i>
               </div>
               <div class="flex-grow">
                 <h3 class="text-xl font-bold text-white mb-1">Wan 2.2 I2V</h3>
@@ -246,9 +221,21 @@
             <span class="relative z-10 bg-[#1a1a1a] text-neutral-400 text-[9px] px-2 py-0.5 rounded-sm uppercase font-bold border border-[#333] whitespace-nowrap ml-4 hidden sm:block">Pro Edit</span>
           </div>
           
-          <!-- Box 6: Small Placeholder -->
-          <div class="md:col-span-2 row-span-1 bg-[#141414]/50 border border-dashed border-[#333] rounded-xl flex flex-col items-center justify-center opacity-60 hover:opacity-100 transition-opacity">
-            <span class="text-neutral-500 font-bold text-sm">Slot</span>
+          <!-- Box 5: Hyperswap Video Swap -->
+          <div onclick="openHubModel('video-swap')" class="md:col-span-2 row-span-1 bg-[#141414] border border-[#262626] rounded-xl p-6 cursor-pointer hover:border-neutral-400 hover:shadow-[0_0_30px_rgba(255,255,255,0.05)] transition-all group relative overflow-hidden flex items-center justify-between">
+            <div class="absolute -right-4 top-1/2 -translate-y-1/2 opacity-[0.03] group-hover:scale-110 transition-transform duration-500">
+              <i data-lucide="user-square-2" class="w-48 h-48 text-white"></i>
+            </div>
+            <div class="relative z-10 flex items-center w-full">
+              <div class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 text-white flex flex-shrink-0 items-center justify-center mr-5 group-hover:scale-110 transition-transform">
+                 <i data-lucide="video" class="w-6 h-6"></i>
+              </div>
+              <div class="flex-grow">
+                <h3 class="text-xl font-bold text-white mb-1">Hyperswap Video</h3>
+                <p class="text-xs text-neutral-400 leading-relaxed max-w-xs">High-definition video face swapping with built-in segment trimming.</p>
+              </div>
+            </div>
+            <span class="relative z-10 bg-[#1a1a1a] text-neutral-400 text-[9px] px-2 py-0.5 rounded-sm uppercase font-bold border border-[#333] whitespace-nowrap ml-4 hidden sm:block">Pro Video Swap</span>
           </div>
 
         </div>
@@ -299,12 +286,21 @@
         </div>
       </div>
 
-    <!-- THIS CLOSES THE view-hub DIV -->
-    </div> 
+      <div id="hub-model-video-swap" class="hidden w-full max-w-7xl mx-auto animate-fade-in">
+        <div class="flex flex-col space-y-4 h-[90vh] w-full">
+          <button onclick="closeHubModel()" class="group flex items-center text-neutral-400 hover:text-white text-sm font-semibold transition-colors bg-[#141414] border border-[#262626] px-4 py-2 rounded-lg hover:border-neutral-500 w-fit flex-shrink-0">
+            <i data-lucide="arrow-left" class="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform"></i> Back to Hub
+          </button>
+          <div class="w-full flex-grow rounded-2xl overflow-hidden border border-[#262626] shadow-2xl bg-[#0a0a0a]">
+            <iframe src="video_swap.html" class="w-full h-full border-none bg-transparent" title="Hyperswap Video Model"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
 
 
     <!-- ===================== GENERATOR TAB (ISOLATED) ===================== -->
-    <div id="view-generator" class="space-y-6 max-w-4xl mx-auto block animate-fade-in w-full">
+    <div id="view-generator" class="space-y-6 max-w-4xl mx-auto block animate-fade-in">
       
       <div class="bg-panelBg rounded-lg border border-panelBorder shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
         <div class="px-4 py-3 border-b border-panelBorder bg-neutral-900/50 flex items-center">
@@ -400,7 +396,7 @@
 
 
     <!-- ===================== EDITOR TAB (ISOLATED) ===================== -->
-    <div id="view-editor" class="space-y-6 max-w-4xl mx-auto hidden animate-fade-in w-full">
+    <div id="view-editor" class="space-y-6 max-w-4xl mx-auto hidden animate-fade-in">
       
       <div class="bg-panelBg rounded-lg border border-panelBorder shadow-lg overflow-hidden transition-shadow hover:shadow-xl">
         <div class="px-4 py-3 border-b border-panelBorder bg-neutral-900/50 flex items-center">
@@ -470,17 +466,14 @@
               </div>
               <input type="file" id="file-editor" class="hidden" accept="image/*" onchange="handleFileSelect(event, 'editor')">
             </div>
-            
-            <!-- Paste & Clear Button Row -->
             <div class="mt-4 flex justify-center gap-3 border-t border-panelBorder pt-4">
-                <button onclick="handlePasteImage('editor')" class="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-neutral-500">
-                    <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 mr-1.5"></i> Paste
-                </button>
-                <button id="dz-editor-clear" onclick="clearDropzone('editor')" class="hidden text-xs font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-danger/50">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Clear
-                </button>
+              <button onclick="handlePasteImage('editor')" class="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded-lg hover:border-neutral-500">
+                <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 mr-1.5"></i> Paste
+              </button>
+              <button id="dz-editor-clear" onclick="clearDropzone('editor')" class="hidden text-xs font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded-lg hover:border-danger/50">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Clear
+              </button>
             </div>
-
           </div>
         </div>
       </div>
@@ -540,7 +533,7 @@
     </div>
 
     <!-- ===================== FACE SWAP TAB ===================== -->
-    <div id="view-faceswap" class="hidden animate-fade-in w-full">
+    <div id="view-faceswap" class="hidden animate-fade-in">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
         
         <!-- Column 1: Source -->
@@ -561,15 +554,13 @@
                   <div id="dz-fs-source-preview" class="hidden absolute inset-0 w-full h-full p-2"><img id="dz-fs-source-img" src="" class="w-full h-full object-contain rounded"><div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded"><p class="text-white text-xs font-semibold tracking-wide">Replace</p></div></div>
                   <input type="file" id="file-fs-source" class="hidden" accept="image/*" onchange="handleFileSelect(event, 'fs-source')">
                 </div>
-                
-                <!-- Paste & Clear Button Row -->
                 <div class="mt-3 flex justify-center gap-2 border-t border-panelBorder pt-3">
-                    <button onclick="handlePasteImage('fs-source')" class="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-neutral-500">
-                        <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 mr-1.5"></i> Paste
-                    </button>
-                    <button id="dz-fs-source-clear" onclick="clearDropzone('fs-source')" class="hidden text-xs font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-danger/50">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Clear
-                    </button>
+                  <button onclick="handlePasteImage('fs-source')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
+                    <i data-lucide="clipboard-paste" class="w-3 h-3 mr-1"></i> Paste
+                  </button>
+                  <button id="dz-fs-source-clear" onclick="clearDropzone('fs-source')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-danger/50">
+                    <i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear
+                  </button>
                 </div>
               </div>
             </div>
@@ -615,15 +606,13 @@
                   <div id="dz-fs-target-preview" class="hidden absolute inset-0 w-full h-full p-2"><img id="dz-fs-target-img" src="" class="w-full h-full object-contain rounded"><div class="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity rounded"><p class="text-white text-xs font-semibold tracking-wide">Replace</p></div></div>
                   <input type="file" id="file-fs-target" class="hidden" accept="image/*" onchange="handleFileSelect(event, 'fs-target')">
                 </div>
-                
-                <!-- Paste & Clear Button Row -->
                 <div class="mt-3 flex justify-center gap-2 border-t border-panelBorder pt-3">
-                    <button onclick="handlePasteImage('fs-target')" class="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-neutral-500">
-                        <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 mr-1.5"></i> Paste
-                    </button>
-                    <button id="dz-fs-target-clear" onclick="clearDropzone('fs-target')" class="hidden text-xs font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-danger/50">
-                        <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Clear
-                    </button>
+                  <button onclick="handlePasteImage('fs-target')" class="text-[11px] font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-neutral-500">
+                    <i data-lucide="clipboard-paste" class="w-3 h-3 mr-1"></i> Paste
+                  </button>
+                  <button id="dz-fs-target-clear" onclick="clearDropzone('fs-target')" class="hidden text-[11px] font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-2.5 py-1 rounded hover:border-danger/50">
+                    <i data-lucide="trash-2" class="w-3 h-3 mr-1"></i> Clear
+                  </button>
                 </div>
               </div>
             </div>
@@ -684,7 +673,7 @@
     </div>
 
     <!-- ===================== COMPRESSOR TAB ===================== -->
-    <div id="view-compressor" class="hidden animate-fade-in w-full">
+    <div id="view-compressor" class="hidden animate-fade-in">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         <!-- Controls Column -->
@@ -711,14 +700,12 @@
                 </div>
                 <input type="file" id="file-compressor" class="hidden" accept="image/*" onchange="handleFileSelect(event, 'compressor')">
               </div>
-              
-              <!-- Paste & Clear Button Row -->
               <div class="mt-4 flex justify-center gap-3 border-t border-panelBorder pt-4">
-                <button onclick="handlePasteImage('compressor')" class="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-neutral-500">
-                    <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 mr-1.5"></i> Paste
+                <button onclick="handlePasteImage('compressor')" class="text-xs font-medium text-neutral-400 hover:text-white transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded-lg hover:border-neutral-500">
+                  <i data-lucide="clipboard-paste" class="w-3.5 h-3.5 mr-1.5"></i> Paste
                 </button>
-                <button id="dz-compressor-clear" onclick="clearDropzone('compressor')" class="hidden text-xs font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded hover:border-danger/50">
-                    <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Clear
+                <button id="dz-compressor-clear" onclick="clearDropzone('compressor')" class="hidden text-xs font-medium text-neutral-400 hover:text-danger transition-colors flex items-center bg-inputBg border border-inputBorder px-3 py-1.5 rounded-lg hover:border-danger/50">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5 mr-1.5"></i> Clear
                 </button>
               </div>
             </div>
@@ -826,22 +813,6 @@
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwqzODzdpNc8BLILC3ZnynKjiqO-fQFYNN078CTvQ9-n4xLvILuPNXdLItYfYZQIy0Ezw/exec";
     const nativeImport = new Function('url', 'return import(url)');
 
-    // --- Toast Notification System ---
-    window.showToast = function(msg) {
-        let toast = document.getElementById('global-toast');
-        if(!toast) {
-            toast = document.createElement('div');
-            toast.id = 'global-toast';
-            toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-neutral-800 text-white text-xs px-5 py-2.5 rounded-lg shadow-2xl z-[200] transition-opacity duration-300 opacity-0 pointer-events-none border border-neutral-600 flex items-center gap-2 font-medium tracking-wide';
-            toast.innerHTML = '<i data-lucide="info" class="w-4 h-4"></i> <span id="global-toast-msg"></span>';
-            document.body.appendChild(toast);
-            lucide.createIcons({ root: toast });
-        }
-        document.getElementById('global-toast-msg').innerText = msg;
-        toast.classList.remove('opacity-0');
-        setTimeout(() => toast.classList.add('opacity-0'), 3000);
-    };
-
     // --- Format Bytes Utility ---
     function formatBytes(bytes) {
         if (!+bytes) return '0 Bytes';
@@ -862,7 +833,6 @@
             let res = await fetch(url);
             if (res.ok) {
                 let blob = await res.blob();
-                // VERIFY IT IS NOT A JSON ERROR DISGUISED AS AN IMAGE
                 const textCheck = await blob.slice(0, 100).text();
                 if (!textCheck.trim().startsWith('{') && !textCheck.trim().startsWith('<') && !textCheck.includes('Error')) {
                     if (blob.type.includes('image')) return blob;
@@ -880,7 +850,6 @@
                 let res = await fetch(proxyUrl);
                 if (res.ok) {
                     let blob = await res.blob();
-                    // CRUCIAL BUG FIX: Ensure the proxy returned an actual image, NOT a JSON text error file!
                     const textCheck = await blob.slice(0, 100).text();
                     if (!textCheck.trim().startsWith('{') && !textCheck.trim().startsWith('<') && !textCheck.includes('Error')) {
                         if (blob.type.includes('image')) {
@@ -890,15 +859,12 @@
                 }
             } catch(e) { }
         }
-        
         throw new Error("All image fetch attempts failed. Proxy or CORS blocked.");
     }
 
-    // --- Data Normalizer Helper ---
     window.normalizeUrl = function(data) {
         if (!data) return null;
         if (typeof data === 'string') {
-            // Unrestricted Mode occasionally returns full HTML elements. This extracts the SRC correctly.
             const m = data.match(/src=["']([^"']+)["']/i);
             return m ? m[1] : data;
         }
@@ -907,7 +873,6 @@
         return null;
     };
 
-    // --- Core Fix: Universal File Fetcher ---
     async function getFileFromUrl(url) {
         if (!url) return null;
         try {
@@ -923,11 +888,9 @@
         }
     }
 
-    // Helper to upload to Google Apps Script
     async function uploadToDrive(fileOrUrl, type) {
         try {
             let base64Data = ""; let fileName = "image.png"; let mimeType = "image/png";
-            
             if (fileOrUrl instanceof File || fileOrUrl instanceof Blob) {
                 fileName = fileOrUrl.name || `upload_${Date.now()}.png`;
                 mimeType = fileOrUrl.type || "image/png";
@@ -975,18 +938,79 @@
     window.globalFsTargetFile = null; window.globalFsTargetUrl = null; window.globalFsOutputUrl = null;
     window.globalCompressInputFile = null; window.globalCompressInputUrl = null; window.globalCompressOutputUrl = null;
 
-    // --- Multi-Token Vault Logic (Centralized in Pro Hub) ---
+    // --- Toast & Paste Logic ---
+    window.showToast = function(msg) {
+        let toast = document.getElementById('global-toast');
+        if(!toast) {
+            toast = document.createElement('div');
+            toast.id = 'global-toast';
+            toast.className = 'fixed bottom-4 left-1/2 -translate-x-1/2 bg-neutral-800 text-white text-xs px-4 py-2 rounded shadow-lg z-[200] transition-opacity duration-300 opacity-0 pointer-events-none border border-neutral-600';
+            document.body.appendChild(toast);
+        }
+        toast.innerText = msg;
+        toast.classList.remove('opacity-0');
+        setTimeout(() => toast.classList.add('opacity-0'), 3000);
+    };
+
+    window.handlePasteImage = async function(type) {
+        try {
+            if (!navigator.clipboard || !navigator.clipboard.read) {
+                window.showToast("Clipboard API blocked. Click dropzone & use Ctrl+V.");
+                return;
+            }
+            const clipboardItems = await navigator.clipboard.read();
+            for (const item of clipboardItems) {
+                for (const typeStr of item.types) {
+                    if (typeStr.startsWith('image/')) {
+                        const blob = await item.getType(typeStr);
+                        const file = new File([blob], `pasted_${Date.now()}.${typeStr.split('/')[1]}`, { type: typeStr });
+                        processFile(file, type);
+                        window.showToast("Image pasted successfully!");
+                        return;
+                    }
+                }
+            }
+            window.showToast("No image found in clipboard.");
+        } catch (err) {
+            console.error("Paste Error:", err);
+            window.showToast("Clipboard access denied. Ensure permissions are granted.");
+        }
+    };
+
+    document.addEventListener('paste', (e) => {
+        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+        for (const item of items) {
+            if (item.type.indexOf('image') === 0) {
+                const file = item.getAsFile();
+                let activeDz = null;
+                if (appState.tab === 'editor') activeDz = 'editor';
+                else if (appState.tab === 'compressor') activeDz = 'compressor';
+                else if (appState.tab === 'faceswap') activeDz = !globalFsSourceFile ? 'fs-source' : 'fs-target';
+                
+                if(activeDz) {
+                    processFile(file, activeDz);
+                    window.showToast("Image pasted from shortcut!");
+                }
+                return;
+            }
+        }
+    });
+
+    // --- Multi-Token Vault Logic ---
     window.hubTokens = [];
     let hubValidationTimeout = null;
 
     window.loadHubTokens = () => {
-        try {
-            const saved = JSON.parse(localStorage.getItem('hf_tokens'));
-            if (Array.isArray(saved) && saved.length > 0) {
-                window.hubTokens = saved.map(t => ({ ...t, status: t.status || 'idle', user: t.user || null }));
-                return;
-            }
-        } catch(e) {}
+        const saved = localStorage.getItem('hf_tokens');
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                if (Array.isArray(parsed) && parsed.length > 0) {
+                    window.hubTokens = parsed.map(t => ({ ...t, status: 'idle', user: null }));
+                    return;
+                }
+            } catch(e) {}
+        }
         window.hubTokens = [{ id: Date.now().toString(), value: '', status: 'idle', user: null }];
     };
 
@@ -995,7 +1019,7 @@
     };
 
     window.addHubToken = () => {
-        window.hubTokens.push({ id: Date.now().toString() + Math.random().toString(36).substr(2, 5), value: '', status: 'idle', user: null });
+        window.hubTokens.push({ id: Date.now().toString(), value: '', status: 'idle', user: null });
         renderHubTokens();
     };
 
@@ -1032,20 +1056,13 @@
                         const data = await response.json();
                         window.hubTokens[i].status = 'valid';
                         window.hubTokens[i].user = data.name || 'Verified User';
-                        
-                        // Push new valid tokens to Global Pool
-                        fetch(GAS_URL, {
-                            method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain" },
-                            body: JSON.stringify({ type: 'TokenUpdate', token: { value: window.hubTokens[i].value, user: data.name || 'Verified User', addedAt: new Date().toISOString() } })
-                        }).catch(e => console.error("Silent Sync Error"));
-                        
                     } else {
                         window.hubTokens[i].status = 'invalid';
                     }
                 } catch (err) {
                     window.hubTokens[i].status = 'invalid';
                 }
-                saveHubTokens(); // Save validated state
+                saveHubTokens();
                 needsRender = true;
             }
         }
@@ -1069,7 +1086,7 @@
             let msgHTML = '';
             if (token.status === 'valid' && token.user) msgHTML = `<p class="text-[10px] text-green-400 flex items-center gap-1"><i data-lucide="user" class="w-3 h-3"></i> Connected as <span class="font-semibold text-green-300">${token.user}</span></p>`;
             if (token.status === 'exhausted') msgHTML = `<p class="text-[10px] text-[#ff4444] flex items-center gap-1"><i data-lucide="x-circle" class="w-3 h-3"></i> Rate limited / Quota exhausted</p>`;
-            if (token.status === 'invalid') msgHTML = `<p class="text-[10px] text-yellow-400 flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> Invalid format</p>`;
+            if (token.status === 'invalid') msgHTML = `<p class="text-[10px] text-yellow-400 flex items-center gap-1"><i data-lucide="alert-circle" class="w-3 h-3"></i> Invalid token format</p>`;
 
             return `
                 <div class="bg-[#0a0a0a] border border-[#262626] rounded-xl p-3 relative mb-3 last:mb-0">
@@ -1088,7 +1105,6 @@
         lucide.createIcons({ root: container });
     };
 
-    // --- JSON IMPORT / EXPORT LOGIC ---
     window.exportTokens = () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.hubTokens, null, 2));
         const dl = document.createElement('a'); dl.setAttribute("href", dataStr); dl.setAttribute("download", "shinyy_lab_tokens.json");
@@ -1120,10 +1136,8 @@
         event.target.value = ""; 
     };
 
-    // --- GLOBAL AUTO-SYNC (POLLING EVERY 30 SECONDS) ---
     window.fetchGlobalTokens = async () => {
         try {
-            // Using redirect:'follow' safely retrieves GAS JSON responses
             const response = await fetch(GAS_URL + "?action=getTokens", { method: 'GET', redirect: 'follow' });
             if (response.ok) {
                 const globalTokens = await response.json();
@@ -1145,50 +1159,32 @@
                     }
                 }
             }
-        } catch (e) { console.warn("Global token sync skipped this cycle."); }
+        } catch (e) { }
     };
 
-    // --- Hub Navigation Logic ---
     window.openHubModel = function(modelId) {
         const hubGrid = document.getElementById('hub-grid-container');
         if(hubGrid) hubGrid.classList.add('hidden');
         
-        if (modelId === 'z-turbo') {
-            const zTurbo = document.getElementById('hub-model-z-turbo');
-            if(zTurbo) zTurbo.classList.remove('hidden');
-        } else if (modelId === 'flux-swap') {
-            const fluxSwap = document.getElementById('hub-model-flux-swap');
-            if(fluxSwap) fluxSwap.classList.remove('hidden');
-        } else if (modelId === 'wan-video') {
-            const wanVideo = document.getElementById('hub-model-wan-video');
-            if(wanVideo) wanVideo.classList.remove('hidden');
-        } else if (modelId === 'qwen-editor') {
-            const qwenEditor = document.getElementById('hub-model-qwen-editor');
-            if(qwenEditor) qwenEditor.classList.remove('hidden');
-        }
+        if (modelId === 'z-turbo') document.getElementById('hub-model-z-turbo')?.classList.remove('hidden');
+        else if (modelId === 'flux-swap') document.getElementById('hub-model-flux-swap')?.classList.remove('hidden');
+        else if (modelId === 'wan-video') document.getElementById('hub-model-wan-video')?.classList.remove('hidden');
+        else if (modelId === 'qwen-editor') document.getElementById('hub-model-qwen-editor')?.classList.remove('hidden');
+        else if (modelId === 'video-swap') document.getElementById('hub-model-video-swap')?.classList.remove('hidden');
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
     
     window.closeHubModel = function() {
-        const zTurbo = document.getElementById('hub-model-z-turbo');
-        if(zTurbo) zTurbo.classList.add('hidden');
-        
-        const fluxSwap = document.getElementById('hub-model-flux-swap');
-        if(fluxSwap) fluxSwap.classList.add('hidden');
-        
-        const wanVideo = document.getElementById('hub-model-wan-video');
-        if(wanVideo) wanVideo.classList.add('hidden');
-
-        const qwenEditor = document.getElementById('hub-model-qwen-editor');
-        if(qwenEditor) qwenEditor.classList.add('hidden');
-        
-        const hubGrid = document.getElementById('hub-grid-container');
-        if(hubGrid) hubGrid.classList.remove('hidden');
-        
+        document.getElementById('hub-model-z-turbo')?.classList.add('hidden');
+        document.getElementById('hub-model-flux-swap')?.classList.add('hidden');
+        document.getElementById('hub-model-wan-video')?.classList.add('hidden');
+        document.getElementById('hub-model-qwen-editor')?.classList.add('hidden');
+        document.getElementById('hub-model-video-swap')?.classList.add('hidden');
+        document.getElementById('hub-grid-container')?.classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    // --- Tab Management ---
     window.switchTab = function(tab) {
       appState.tab = tab;
       ['generator', 'hub', 'editor', 'faceswap', 'compressor'].forEach(t => {
@@ -1210,91 +1206,29 @@
       const viewFs = document.getElementById('view-faceswap'); if(viewFs) viewFs.classList.toggle('hidden', tab !== 'faceswap');
       const viewComp = document.getElementById('view-compressor'); if(viewComp) viewComp.classList.toggle('hidden', tab !== 'compressor');
       
-      // Reset Hub view to grid if leaving the tab
-      if (tab !== 'hub') {
-          const zTurbo = document.getElementById('hub-model-z-turbo'); if(zTurbo) zTurbo.classList.add('hidden');
-          const fluxSwap = document.getElementById('hub-model-flux-swap'); if(fluxSwap) fluxSwap.classList.add('hidden');
-          const wanVideo = document.getElementById('hub-model-wan-video'); if(wanVideo) wanVideo.classList.add('hidden');
-          const qwenEditor = document.getElementById('hub-model-qwen-editor'); if(qwenEditor) qwenEditor.classList.add('hidden');
-          const hubGrid = document.getElementById('hub-grid-container'); if(hubGrid) hubGrid.classList.remove('hidden');
-      }
+      if (tab !== 'hub') closeHubModel();
     };
 
-    // --- Boot Sequence & Listeners ---
     document.addEventListener('DOMContentLoaded', () => {
         loadHubTokens();
         renderHubTokens();
         validateHubTokens();
-        switchTab('generator'); // Safely initialize UI tab once DOM is ready
-        
-        // Start Global Polling Interval (every 30s) + initial quick fetch (after 3s)
+        switchTab('generator');
         setInterval(window.fetchGlobalTokens, 30000);
         setTimeout(window.fetchGlobalTokens, 3000);
     });
 
-    // Cross-Iframe Communication Listener (Receives commands from z_turbo.html)
     window.addEventListener('message', (event) => {
         if (event.data) {
-            // 1. Z-Turbo token hit a rate limit, reload our vault UI to show the Red X
             if (event.data.type === 'TOKEN_EXHAUSTED') {
                 loadHubTokens();
                 renderHubTokens();
-            } 
-            // 2. User clicked "Edit", "Compress", or "Swap" inside the Z-Turbo iframe
-            else if (event.data.type === 'ROUTE_IMAGE') {
+            } else if (event.data.type === 'ROUTE_IMAGE') {
                 window.sendTo(event.data.dest, event.data.url);
             }
         }
     });
 
-    // --- Clipboard Paste Engine ---
-    window.handlePasteImage = async function(type) {
-        try {
-            if (!navigator.clipboard || !navigator.clipboard.read) {
-                window.showToast("Clipboard API blocked by browser. Click the dropzone and use Ctrl+V / Cmd+V.");
-                return;
-            }
-            const clipboardItems = await navigator.clipboard.read();
-            for (const item of clipboardItems) {
-                for (const typeStr of item.types) {
-                    if (typeStr.startsWith('image/')) {
-                        const blob = await item.getType(typeStr);
-                        const file = new File([blob], `pasted_${Date.now()}.${typeStr.split('/')[1]}`, { type: typeStr });
-                        processFile(file, type);
-                        window.showToast("Image pasted successfully!");
-                        return;
-                    }
-                }
-            }
-            window.showToast("No image found in clipboard.");
-        } catch (err) {
-            console.error("Paste Error:", err);
-            window.showToast("Clipboard access denied. Ensure browser permissions are granted, or use Ctrl+V.");
-        }
-    };
-
-    // Global Paste Listener fallback for active tab/dropzones (Listens for Ctrl+V globally)
-    document.addEventListener('paste', (e) => {
-        const items = (e.clipboardData || e.originalEvent.clipboardData).items;
-        for (const item of items) {
-            if (item.type.indexOf('image') === 0) {
-                const file = item.getAsFile();
-                // Determine active dropzone based on appState tab
-                let activeDz = null;
-                if (appState.tab === 'editor') activeDz = 'editor';
-                else if (appState.tab === 'compressor') activeDz = 'compressor';
-                else if (appState.tab === 'faceswap') activeDz = !globalFsSourceFile ? 'fs-source' : 'fs-target';
-                
-                if(activeDz) {
-                    processFile(file, activeDz);
-                    window.showToast("Image pasted from shortcut!");
-                }
-                return;
-            }
-        }
-    });
-
-    // --- Slider Logic ---
     window.updateSlider = function(id, val) {
         const clip = document.getElementById(`${id}-slider-before`);
         const handle = document.getElementById(`${id}-slider-handle`);
@@ -1302,7 +1236,6 @@
         if(handle) handle.style.left = `${val}%`;
     };
 
-    // --- Dropzone & Shared UI ---
     window.triggerFileInput = id => document.getElementById(id)?.click();
     window.handleDrop = (e, type) => { e.preventDefault(); processFile(e.dataTransfer.files[0], type); };
     window.handleFileSelect = (e, type) => processFile(e.target.files[0], type);
@@ -1392,7 +1325,7 @@
         if(preview) preview.classList.add('hidden');
 
         const fileObj = await getFileFromUrl(url);
-        if (!fileObj) throw new Error("Could not construct File object for AI upload.");
+        if (!fileObj) throw new Error("Could not construct File object.");
         processFile(fileObj, dest);
       } catch (e) { 
         const empty = document.getElementById(`dz-${dest}-empty`);
@@ -1435,7 +1368,6 @@
       }
     };
 
-    // --- Compressor Engine ---
     let driveSyncTimer = null;
     window.runCompression = async function() {
         if (!globalCompressInputUrl) return;
@@ -1483,12 +1415,10 @@
 
                 }, format, quality);
             };
-            img.onerror = () => { console.error("Failed to load image for real-time compression"); };
             img.src = globalCompressInputUrl;
-        } catch (e) { console.error(e); }
+        } catch (e) {}
     };
 
-    // --- Tab-Specific UI Controls ---
     window.setAspect = function(tab, val) {
       appState[tab].aspect = val;
       const ratios = ['1:1', '9:16'];
@@ -1534,7 +1464,6 @@
         if(badge) badge.classList.remove('hidden');
         if(container) container.classList.add('border-danger/40');
 
-        // Unrestricted mode ignores aspect ratio, so disable the selections
         allRatios.forEach(r => {
           const idVal = r.replace(':', '-');
           const input = document.getElementById(`${tab}-ar-${idVal}`);
@@ -1559,7 +1488,6 @@
         if(badge) badge.classList.add('hidden');
         if(container) container.classList.remove('border-danger/40');
 
-        // Normal mode uses aspect ratio, re-enable selections
         allRatios.forEach(r => {
           const idVal = r.replace(':', '-');
           const input = document.getElementById(`${tab}-ar-${idVal}`);
@@ -1590,7 +1518,6 @@
       if(subtext) subtext.classList.toggle('hidden', !!globalEditorInputFile);
     };
     
-    // --- Generator Tab Engine ---
     window.runGenerator = async function() {
       const promptText = document.getElementById('generator-prompt').value;
       if(!promptText) { document.getElementById('generator-error').classList.remove('hidden'); document.getElementById('generator-error-text').innerText="Please enter a prompt."; return; }
@@ -1598,7 +1525,6 @@
       appState.generator.loading = true; 
       document.getElementById('btn-generator').disabled = true;
       document.getElementById('generator-error').classList.add('hidden');
-      
       document.getElementById('out-generator-empty').classList.add('hidden');
       document.getElementById('out-generator-single').classList.add('hidden');
       document.getElementById('out-generator-loading').classList.remove('hidden');
@@ -1632,11 +1558,6 @@
             document.getElementById('out-generator-single').classList.remove('hidden');
             renderActionButtons('generator-action-buttons', finalUrl);
           };
-          preloadImg.onerror = () => {
-            document.getElementById('out-generator-loading').classList.add('hidden');
-            document.getElementById('img-generator-single').src = finalUrl;
-            document.getElementById('out-generator-single').classList.remove('hidden');
-          };
           preloadImg.src = finalUrl;
         } else {
             throw new Error(appState.generator.isNSFW ? "You have been rate limited. Please wait until it's reset." : "Failed to generate image.");
@@ -1644,25 +1565,19 @@
       } catch (err) {
         clearInterval(interval); document.getElementById('out-generator-loading').classList.add('hidden'); document.getElementById('out-generator-empty').classList.remove('hidden');
         document.getElementById('generator-error').classList.remove('hidden');
-        
-        let finalMsg = err.message || "An error occurred during generation.";
-        finalMsg += "\n\n💡 Beginner Tip: If you used an NSFW or explicit prompt, many models completely block them and crash secretly. Unrestricted Mode handles them better, but even that has limits. Try adjusting your prompt.";
-        document.getElementById('generator-error-text').innerText = finalMsg;
-        
+        document.getElementById('generator-error-text').innerText = err.message || "An error occurred during generation.";
       } finally {
         appState.generator.loading = false; 
         document.getElementById('btn-generator').disabled = false;
       }
     };
 
-    // --- Editor Tab Engine ---
     window.runEditor = async function() {
       const promptText = document.getElementById('editor-prompt').value;
       if(!promptText) { document.getElementById('editor-error').classList.remove('hidden'); document.getElementById('editor-error-text').innerText="Please enter a prompt."; return; }
       
       appState.editor.loading = true; updateEditorButtonState();
       document.getElementById('editor-error').classList.add('hidden');
-      
       document.getElementById('out-editor-empty').classList.add('hidden');
       document.getElementById('out-editor-slider').classList.add('hidden');
       document.getElementById('out-editor-loading').classList.remove('hidden');
@@ -1701,28 +1616,19 @@
             document.getElementById('out-editor-slider').classList.remove('hidden');
             renderActionButtons('editor-action-buttons', finalUrl);
           };
-          preloadImg.onerror = () => {
-            document.getElementById('out-editor-loading').classList.add('hidden');
-            document.getElementById('out-editor-slider').classList.remove('hidden');
-          };
           preloadImg.src = finalUrl;
         } else {
-            throw new Error(appState.editor.isNSFW ? "You have been rate limited. Please wait until it's reset." : "Failed to edit image.");
+            throw new Error("Failed to edit image.");
         }
       } catch (err) {
         clearInterval(interval); document.getElementById('out-editor-loading').classList.add('hidden'); document.getElementById('out-editor-empty').classList.remove('hidden');
         document.getElementById('editor-error').classList.remove('hidden');
-        
-        let finalMsg = err.message || "An error occurred during editing.";
-        finalMsg += "\n\n💡 Beginner Tip: If you used an NSFW or explicit prompt, many models completely block them and crash secretly. Unrestricted Mode handles them better, but even that has limits. Try adjusting your prompt.";
-        document.getElementById('editor-error-text').innerText = finalMsg;
-        
+        document.getElementById('editor-error-text').innerText = err.message || "An error occurred during editing.";
       } finally {
         appState.editor.loading = false; updateEditorButtonState();
       }
     };
 
-    // --- Face Swap Engine ---
     window.runFaceSwap = async function() {
       if (!globalFsSourceFile || !globalFsTargetFile) { 
         document.getElementById('fs-error').classList.remove('hidden'); 
@@ -1768,6 +1674,8 @@
         }
       } catch (err) {
         clearInterval(interval); document.getElementById('out-fs-loading').classList.add('hidden'); document.getElementById('out-fs-empty').classList.remove('hidden');
+        document.getElementById('fs-error').classList.remove('hidden'); 
+        document.getElementById('fs-error-text').innerText = "Swap failed.";
       } finally {
         btn.disabled = false; btn.innerText = "Initialize Swap";
       }
